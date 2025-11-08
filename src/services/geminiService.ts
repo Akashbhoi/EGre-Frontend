@@ -1,4 +1,9 @@
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+const API_KEYS = (import.meta.env.VITE_GEMINI_API_KEYS || '')
+  .split(',')
+  .map((key: string) => key.trim())
+  .filter((key: string) => key);
+
+let currentApiKeyIndex = 0;
 
 // System prompt for GRE study assistant
 const SYSTEM_PROMPT = `You are a helpful GRE study assistant. Your role is to:
@@ -7,15 +12,14 @@ const SYSTEM_PROMPT = `You are a helpful GRE study assistant. Your role is to:
 - Provide study tips and strategies
 - Answer questions about verbal reasoning, quantitative reasoning, and analytical writing
 - Encourage and motivate students
+
+**IMPORTANT RULE:** Do NOT provide the direct answer or a complete solution to the user's question unless they explicitly ask for it using a phrase like "give me the complete solution". Instead, guide them with hints, explanations of concepts, or by breaking down the problem. Your primary goal is to help them learn how to solve the problem themselves.
+
 Keep your responses concise, clear, and educational. Be friendly and supportive.`;
 
 // Use REST API directly to avoid v1beta issues
-const callGeminiAPI = async (prompt: string): Promise<string> => {
-  if (!API_KEY) {
-    throw new Error('API key not configured');
-  }
-
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${API_KEY}`;
+const callGeminiAPI = async (prompt: string, apiKey: string): Promise<string> => {
+  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${apiKey}`;
 
   const response = await fetch(url, {
     method: 'POST',
@@ -40,37 +44,69 @@ const callGeminiAPI = async (prompt: string): Promise<string> => {
   return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated';
 };
 
+const callGeminiWithRotation = async (prompt: string): Promise<string> => {
+  if (API_KEYS.length === 0) {
+    throw new Error('API keys not configured');
+  }
+
+  for (let i = 0; i < API_KEYS.length; i++) {
+    const apiKey = API_KEYS[currentApiKeyIndex];
+    try {
+      const result = await callGeminiAPI(prompt, apiKey);
+      return result;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+      const isKeyError = message.includes('API key') || message.includes('API_KEY_INVALID') || message.includes('429');
+
+      if (isKeyError) {
+        console.warn(`API key ${currentApiKeyIndex + 1} failed. Trying next key.`);
+        currentApiKeyIndex = (currentApiKeyIndex + 1) % API_KEYS.length;
+      } else {
+        throw error; // Re-throw non-key related errors
+      }
+    }
+  }
+
+  throw new Error('All API keys failed.');
+};
+
 // Send a message to Gemini and get a response
-export const sendMessageToGemini = async (userMessage: string): Promise<string> => {
-  if (!API_KEY) {
+export const sendMessageToGemini = async (userMessage: string, questionContext: string): Promise<string> => {
+  if (API_KEYS.length === 0) {
     return "I'm having trouble connecting right now. Please make sure the API key is configured correctly.";
   }
 
   try {
-    const prompt = `${SYSTEM_PROMPT}\n\nUser: ${userMessage}\n\nAssistant:`;
+    const prompt = `${SYSTEM_PROMPT}\n\nHere is the question for context:\n${questionContext}\n\nUser: ${userMessage}\n\nAssistant:`;
     console.log('Sending request to Gemini...');
 
-    const text = await callGeminiAPI(prompt);
+    const text = await callGeminiWithRotation(prompt);
     console.log('Received response from Gemini');
 
     return text || "I'm sorry, I couldn't generate a response. Please try again.";
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error calling Gemini API:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+
     console.error('Error details:', {
-      message: error?.message
+      message,
     });
 
-    if (error?.message?.includes('API key') || error?.message?.includes('API_KEY_INVALID')) {
-      return "API key error. Please check your configuration in Google AI Studio.";
+    if (message.includes('API key') || message.includes('API_KEY_INVALID')) {
+      return 'API key error. Please check your configuration in Google AI Studio.';
+    }
+    
+    if (message.includes('All API keys failed')) {
+      return "All available API keys seem to be exhausted or invalid. Please check your configuration.";
     }
 
-    return `Error: ${error?.message || 'Unknown error'}. Please check the console for details.`;
+    return `Error: ${message}. Please check the console for details.`;
   }
 };
 
 // Get a contextual hint for a question
 export const getQuestionHint = async (question: string, options: string[]): Promise<string> => {
-  if (!API_KEY) {
+  if (API_KEYS.length === 0) {
     return "Hints are temporarily unavailable.";
   }
 
@@ -84,11 +120,17 @@ ${options.map((opt, i) => `${String.fromCharCode(65 + i)}. ${opt}`).join('\n')}
 
 Provide a brief hint that helps the student think through the problem without giving away the answer.`;
 
-    const text = await callGeminiAPI(prompt);
+    const text = await callGeminiWithRotation(prompt);
     return text || "Try breaking down the problem step by step.";
   } catch (error) {
     console.error('Error getting hint:', error);
-    return "Try reading the question carefully and eliminating obviously wrong answers first.";
+    const message = error instanceof Error ? error.message : 'Unknown error';
+
+    if (message.includes('All API keys failed')) {
+      return "Hint service is temporarily unavailable due to API key issues.";
+    }
+    
+    return "Could not fetch a hint at this time. Please try again later.";
   }
 };
 

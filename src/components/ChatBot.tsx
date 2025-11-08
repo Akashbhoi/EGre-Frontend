@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import './ChatBot.css';
 import { sendMessageToGemini } from '../services/geminiService';
 
@@ -9,7 +11,11 @@ interface Message {
   timestamp: Date;
 }
 
-const ChatBot = () => {
+interface ChatBotProps {
+  questionContext: string;
+}
+
+const ChatBot = ({ questionContext }: ChatBotProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -30,6 +36,18 @@ const ChatBot = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Reset chat when the question context changes
+  useEffect(() => {
+    setMessages([
+      {
+        id: '1',
+        text: "Hi! I'm your GRE study assistant. I can help you understand questions, explain concepts, and provide study tips. How can I help you today?",
+        sender: 'bot',
+        timestamp: new Date(),
+      },
+    ]);
+  }, [questionContext]);
+
   const handleSendMessage = async () => {
     if (inputMessage.trim() === '' || isLoading) return;
 
@@ -45,7 +63,7 @@ const ChatBot = () => {
     setIsLoading(true);
 
     try {
-      const botResponse = await sendMessageToGemini(inputMessage);
+      const botResponse = await sendMessageToGemini(inputMessage, questionContext);
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -110,7 +128,11 @@ const ChatBot = () => {
               {message.sender === 'user' ? '👤' : '🤖'}
             </div>
             <div className="message-content">
-              <p>{message.text}</p>
+              {message.sender === 'bot' ? (
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.text}</ReactMarkdown>
+              ) : (
+                <p>{message.text}</p>
+              )}
               <span className="message-time">
                 {message.timestamp.toLocaleTimeString([], {
                   hour: '2-digit',

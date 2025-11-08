@@ -243,6 +243,8 @@ const Quiz = () => {
     return null;
   }
 
+  const questionContext = `Question: "${currentQuestion.question}"\nOptions: ${currentQuestion.options.map((o, i) => `${String.fromCharCode(65 + i)}. ${o}`).join(', ')}`;
+
   return (
     <div className="quiz">
       <div className="container quiz-container">
@@ -465,7 +467,7 @@ const Quiz = () => {
 
           {/* AI ChatBot - Right Side */}
           <div className="chatbot-sidebar">
-            <ChatBot />
+            <ChatBot questionContext={questionContext} />
           </div>
         </div>
       </div>
@@ -501,7 +503,7 @@ const Quiz = () => {
             >
               ✕
             </button>
-            <ChatBot />
+            <ChatBot questionContext={questionContext} />
           </div>
         </div>
       )}
