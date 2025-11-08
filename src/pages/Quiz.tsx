@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getQuestionsForSet } from '../data/questions';
 import type { Question } from '../data/questions';
 import QuizResults from '../components/QuizResults';
+import Graph from '../components/Graph';
 import './Quiz.css';
 
 interface QuestionResult {
@@ -345,6 +346,14 @@ const Quiz = () => {
             </div>
 
             <div className="question-content-modern">
+              {currentQuestion.hasGraph && currentQuestion.graphData && (
+                <Graph
+                  equation={currentQuestion.graphData.equation}
+                  type={currentQuestion.graphData.type}
+                  highlightPoints={currentQuestion.graphData.highlightPoints || []}
+                />
+              )}
+              
               <div className="question-text-modern">
                 {currentQuestion.question}
               </div>

@@ -9,6 +9,12 @@ export interface Question {
   topic: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   hint?: string;
+  hasGraph?: boolean;
+  graphData?: {
+    equation: string;
+    type: 'quadratic' | 'linear' | 'exponential';
+    highlightPoints?: Array<{ x: number; y: number; label?: string }>;
+  };
 }
 
 // Quantitative Reasoning Questions
@@ -105,13 +111,44 @@ const quantitativeQuestions: Question[] = [
   },
   {
     id: 'q10',
-    question: 'What is the sum of the interior angles of a hexagon?',
-    options: ['540°', '720°', '900°', '1080°'],
-    correctAnswer: 1,
-    explanation: 'Sum of interior angles = (n - 2) × 180° = (6 - 2) × 180° = 4 × 180° = 720°',
-    topic: 'Geometry',
-    difficulty: 'Medium',
-    hint: 'Use the formula: (n - 2) × 180° for an n-sided polygon.',
+    question: `The graph above shows the function f(x) = x² - 4x + 3 for all real values of x.
+
+Consider the following statements about the graph:
+I. The function has a minimum value of -1 at x = 2
+II. The function is decreasing on the interval (-∞, 2) and increasing on the interval (2, ∞)
+III. The function f(x) = 0 has exactly two real solutions
+
+Based on the graph and the properties of quadratic functions, which of the following statements must be true?`,
+    options: [
+      'I only',
+      'II only',
+      'I and II only',
+      'I, II, and III',
+    ],
+    correctAnswer: 3,
+    explanation: `All three statements are true for the quadratic function f(x) = x² - 4x + 3.
+
+Statement I: Since the parabola opens upward (coefficient of x² is positive), the vertex represents the minimum point. The vertex is at (2, -1), so the minimum value is -1 at x = 2. ✓
+
+Statement II: For a quadratic function that opens upward, the function decreases from -∞ to the x-coordinate of the vertex, and increases from the x-coordinate of the vertex to ∞. Since the vertex is at x = 2, the function is decreasing on (-∞, 2) and increasing on (2, ∞). ✓
+
+Statement III: The function f(x) = 0 means we need to find where the graph intersects the x-axis. The graph shows intersections at x = 1 and x = 3. We can verify: f(1) = 1² - 4(1) + 3 = 0 and f(3) = 3² - 4(3) + 3 = 0. Since this is a quadratic function, it can have at most 2 real roots, and we have exactly 2. ✓
+
+Therefore, all three statements are true.`,
+    topic: 'Coordinate Geometry',
+    difficulty: 'Hard',
+    hint: 'For a quadratic function f(x) = ax² + bx + c where a > 0, the vertex is the minimum point. The function decreases before the vertex and increases after it. The number of x-intercepts equals the number of real solutions to f(x) = 0.',
+    hasGraph: true,
+    graphData: {
+      equation: 'x² - 4x + 3',
+      type: 'quadratic',
+      highlightPoints: [
+        { x: 1, y: 0, label: 'A' },
+        { x: 2, y: -1, label: 'Vertex' },
+        { x: 3, y: 0, label: 'B' },
+        { x: 0, y: 3, label: 'C' },
+      ],
+    },
   },
 ];
 
