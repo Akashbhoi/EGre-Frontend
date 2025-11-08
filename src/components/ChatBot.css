@@ -23,6 +23,40 @@
   gap: var(--spacing-md);
 }
 
+.chatbot-provider-selector {
+  margin-top: var(--spacing-sm);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.provider-select {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--color-periwinkle);
+  background: var(--color-white);
+  color: var(--color-periwinkle);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.provider-select:hover:not(:disabled) {
+  background: rgba(107, 127, 215, 0.05);
+  border-color: var(--color-periwinkle-light);
+}
+
+.provider-select:focus {
+  border-color: var(--color-periwinkle-light);
+  box-shadow: 0 0 0 3px rgba(107, 127, 215, 0.1);
+}
+
+.provider-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .chatbot-icon {
   font-size: 2rem;
   display: flex;

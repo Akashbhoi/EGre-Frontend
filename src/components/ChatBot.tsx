@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import './ChatBot.css';
-import { sendMessageToGemini } from '../services/geminiService';
+import { sendMessage, getAvailableProviders, type AIProvider } from '../services/aiService';
 
 interface Message {
   id: string;
@@ -16,10 +16,14 @@ interface ChatBotProps {
 }
 
 const ChatBot = ({ questionContext }: ChatBotProps) => {
+  const availableProviders = getAvailableProviders();
+  const [selectedProvider, setSelectedProvider] = useState<AIProvider>(
+    availableProviders.length > 0 ? availableProviders[0] : 'gemini'
+  );
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hi! I'm your GRE study assistant. I can help you understand questions, explain concepts, and provide study tips. How can I help you today?",
+      text: "Hi! I'm your GRE study assistant. How can I help?",
       sender: 'bot',
       timestamp: new Date(),
     },
@@ -41,7 +45,7 @@ const ChatBot = ({ questionContext }: ChatBotProps) => {
     setMessages([
       {
         id: '1',
-        text: "Hi! I'm your GRE study assistant. I can help you understand questions, explain concepts, and provide study tips. How can I help you today?",
+        text: "Hi! I'm your GRE study assistant. How can I help?",
         sender: 'bot',
         timestamp: new Date(),
       },
@@ -63,7 +67,7 @@ const ChatBot = ({ questionContext }: ChatBotProps) => {
     setIsLoading(true);
 
     try {
-      const botResponse = await sendMessageToGemini(inputMessage, questionContext);
+      const botResponse = await sendMessage(inputMessage, questionContext, selectedProvider);
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -116,6 +120,26 @@ const ChatBot = ({ questionContext }: ChatBotProps) => {
             </span>
           </div>
         </div>
+        {availableProviders.length > 1 && (
+          <div className="chatbot-provider-selector">
+            <select
+              value={selectedProvider}
+              onChange={(e) => setSelectedProvider(e.target.value as AIProvider)}
+              className="provider-select"
+              disabled={isLoading}
+            >
+              {availableProviders.includes('gemini') && (
+                <option value="gemini">Gemini 1.5 Flash</option>
+              )}
+              {availableProviders.includes('openai') && (
+                <option value="openai">GPT-4o Mini</option>
+              )}
+              {availableProviders.includes('groq') && (
+                <option value="groq">Groq Llama 3.3 (Fast & Free)</option>
+              )}
+            </select>
+          </div>
+        )}
       </div>
 
       <div className="chatbot-messages">
@@ -188,7 +212,15 @@ const ChatBot = ({ questionContext }: ChatBotProps) => {
       </div>
 
       <div className="chatbot-footer">
-        <small>💡 Powered by Google Gemini AI</small>
+        <small>
+          💡 Powered by {
+            selectedProvider === 'openai' 
+              ? 'OpenAI GPT-4o Mini' 
+              : selectedProvider === 'groq' 
+                ? 'Groq Llama 3.3 70B' 
+                : 'Google Gemini 1.5 Flash'
+          }
+        </small>
       </div>
     </div>
   );
