@@ -113,7 +113,7 @@ const ChatBot = ({ questionContext }: ChatBotProps) => {
         <div className="chatbot-header-content">
           <div className="chatbot-icon">🤖</div>
           <div className="chatbot-header-text">
-            <h3>AI Study Assistant</h3>
+            <h3>AI Mentor</h3>
             <span className="chatbot-status">
               <span className="status-dot"></span>
               Ready to help
