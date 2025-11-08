@@ -354,8 +354,20 @@ const Quiz = () => {
                 />
               )}
               
-              <div className="question-text-modern">
-                {currentQuestion.question}
+              <div className="question-text-container">
+                <div className="question-text-modern">
+                  {currentQuestion.question}
+                </div>
+                {!showExplanation && (
+                  <button
+                    className="btn-hint-inline"
+                    onClick={handleUseHint}
+                    disabled={showHint}
+                  >
+                    <span>💡</span>
+                    {showHint ? 'Hint Used' : 'Use Hint'}
+                  </button>
+                )}
               </div>
               
               {showHint && currentQuestion.hint && (
@@ -433,16 +445,6 @@ const Quiz = () => {
                 >
                   ← Previous
                 </button>
-                {!showExplanation && (
-                  <button
-                    className="btn-hint-modern"
-                    onClick={handleUseHint}
-                    disabled={showHint}
-                  >
-                    <span>💡</span>
-                    {showHint ? 'Hint Used' : 'Use Hint'}
-                  </button>
-                )}
                 {!showExplanation ? (
                   <button
                     className="btn-submit-modern"
