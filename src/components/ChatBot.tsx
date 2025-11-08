@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import './ChatBot.css';
+import { sendMessageToGemini } from '../services/geminiService';
 
 interface Message {
   id: string;
@@ -18,9 +19,19 @@ const ChatBot = () => {
     },
   ]);
   const [inputMessage, setInputMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSendMessage = () => {
-    if (inputMessage.trim() === '') return;
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSendMessage = async () => {
+    if (inputMessage.trim() === '' || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -31,17 +42,33 @@ const ChatBot = () => {
 
     setMessages((prev) => [...prev, userMessage]);
     setInputMessage('');
+    setIsLoading(true);
 
-    // Simulate bot response (placeholder)
-    setTimeout(() => {
+    try {
+      const botResponse = await sendMessageToGemini(inputMessage);
+
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "I'm a UI mockup. Connect me to an AI service to provide real responses!",
+        text: botResponse,
         sender: 'bot',
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, botMessage]);
-    }, 500);
+    } catch (error) {
+      console.error('Error sending message:', error);
+
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "I'm having trouble responding right now. Please try again.",
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -93,6 +120,19 @@ const ChatBot = () => {
             </div>
           </div>
         ))}
+        {isLoading && (
+          <div className="message message-bot">
+            <div className="message-avatar">🤖</div>
+            <div className="message-content">
+              <p className="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </p>
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="chatbot-quick-prompts">
@@ -119,14 +159,14 @@ const ChatBot = () => {
         <button
           className="chatbot-send-btn"
           onClick={handleSendMessage}
-          disabled={inputMessage.trim() === ''}
+          disabled={inputMessage.trim() === '' || isLoading}
         >
           <span>➤</span>
         </button>
       </div>
 
       <div className="chatbot-footer">
-        <small>💡 AI-powered assistant (mockup)</small>
+        <small>💡 Powered by Google Gemini AI</small>
       </div>
     </div>
   );
