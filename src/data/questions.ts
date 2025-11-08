@@ -153,7 +153,7 @@ Therefore, all three statements are true.`,
     hint: 'For a quadratic function f(x) = ax² + bx + c where a > 0, the vertex is the minimum point. The function decreases before the vertex and increases after it. The number of x-intercepts equals the number of real solutions to f(x) = 0.',
     hasGraph: true,
     graphData: {
-      equation: 'x² - 4x + 3',
+      equation: 'x^2 - 4x + 3',
       type: 'quadratic',
       highlightPoints: [
         { x: 1, y: 0, label: 'A' },
