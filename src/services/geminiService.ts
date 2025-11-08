@@ -97,7 +97,7 @@ export const sendMessageToGemini = async (userMessage: string, questionContext: 
     }
     
     if (message.includes('All API keys failed')) {
-      return "All available API keys seem to be exhausted or invalid. Please check your configuration.";
+      return "I'm having trouble responding right now. Please try again in a moment.";
     }
 
     return `Error: ${message}. Please check the console for details.`;
@@ -127,7 +127,7 @@ Provide a brief hint that helps the student think through the problem without gi
     const message = error instanceof Error ? error.message : 'Unknown error';
 
     if (message.includes('All API keys failed')) {
-      return "Hint service is temporarily unavailable due to API key issues.";
+      return "Sorry, I couldn't get a hint for you right now. Please try again in a moment.";
     }
     
     return "Could not fetch a hint at this time. Please try again later.";

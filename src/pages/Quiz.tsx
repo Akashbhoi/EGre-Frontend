@@ -355,6 +355,7 @@ const Quiz = () => {
                   equation={currentQuestion.graphData.equation}
                   type={currentQuestion.graphData.type}
                   highlightPoints={currentQuestion.graphData.highlightPoints || []}
+                  hideEquation={currentQuestion.graphData.hideEquation}
                 />
               )}
               

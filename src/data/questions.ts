@@ -14,6 +14,7 @@ export interface Question {
     equation: string;
     type: 'quadratic' | 'linear' | 'exponential';
     highlightPoints?: Array<{ x: number; y: number; label?: string }>;
+    hideEquation?: boolean;
   };
 }
 
@@ -81,13 +82,25 @@ const quantitativeQuestions: Question[] = [
   },
   {
     id: 'q7',
-    question: 'If a rectangle has length 8 and width 6, what is the length of its diagonal?',
-    options: ['10', '12', '14', '16'],
+    question: 'What is the equation of the parabola shown in the graph?',
+    options: [
+      'y = x² - 2x + 1',
+      'y = x² + 2x + 1',
+      'y = -x² + 2x + 1',
+      'y = x² - 1',
+    ],
     correctAnswer: 0,
-    explanation: 'Using the Pythagorean theorem: diagonal² = 8² + 6² = 64 + 36 = 100. Therefore, diagonal = 10',
-    topic: 'Geometry',
+    explanation: 'The graph shows a parabola with its vertex at (1, 0). The equation y = x² - 2x + 1 can be factored as y = (x - 1)², which is a standard parabola shifted 1 unit to the right, matching the vertex.',
+    topic: 'Coordinate Geometry',
     difficulty: 'Medium',
-    hint: 'The diagonal of a rectangle forms a right triangle with the length and width.',
+    hint: 'Identify the vertex of the parabola from the graph. Then, see which of the given equations has that vertex.',
+    hasGraph: true,
+    graphData: {
+      equation: 'x^2 - 2*x + 1',
+      type: 'quadratic',
+      highlightPoints: [{ x: 1, y: 0, label: 'Vertex' }],
+      hideEquation: true,
+    },
   },
   {
     id: 'q8',
@@ -389,4 +402,3 @@ export const getQuestionsForSet = (setId: string): Question[] => {
   const topic = setIdMap[setId] || setId;
   return questionSets[topic] || questionSets['quantitative-reasoning'];
 };
-

@@ -9,6 +9,7 @@ interface GraphProps {
   yMax?: number;
   highlightPoints?: Array<{ x: number; y: number; label?: string }>;
   showGrid?: boolean;
+  hideEquation?: boolean;
 }
 
 const Graph = ({ 
@@ -19,7 +20,8 @@ const Graph = ({
   yMin = -3,
   yMax = 5,
   highlightPoints = [],
-  showGrid = true
+  showGrid = true,
+  hideEquation = false,
 }: GraphProps) => {
   const width = 600;
   const height = 400;
@@ -40,8 +42,16 @@ const Graph = ({
       const x = xMin + (i / steps) * (xMax - xMin);
       let y = 0;
       
-      if (type === 'quadratic' && equation === 'x² - 4x + 3') {
-        y = x * x - 4 * x + 3;
+      if (type === 'quadratic') {
+        // General quadratic parser: ax^2 + bx + c
+        const cleanedEquation = equation.replace(/\s/g, '').replace(/\*/g, '');
+        const match = cleanedEquation.match(/([+-]?\d*\.?\d*)x\^2([+-]?\d*\.?\d*)x([+-]?\d*\.?\d*)/);
+        if (match) {
+          const a = match[1] === '' || match[1] === '+' ? 1 : match[1] === '-' ? -1 : parseFloat(match[1]);
+          const b = match[2] === '' || match[2] === '+' ? 1 : match[2] === '-' ? -1 : parseFloat(match[2]);
+          const c = match[3] ? parseFloat(match[3]) : 0;
+          y = a * x * x + b * x + c;
+        }
       } else if (type === 'linear' && equation.includes('x')) {
         // Simple linear: y = mx + b format
         const match = equation.match(/([+-]?\d*)x\s*([+-]?\d*)/);
@@ -271,12 +281,13 @@ const Graph = ({
           y
         </text>
       </svg>
-      <div className="graph-equation">
-        f(x) = {equation}
-      </div>
+      {!hideEquation && (
+        <div className="graph-equation">
+          f(x) = {equation}
+        </div>
+      )}
     </div>
   );
 };
 
 export default Graph;
-
