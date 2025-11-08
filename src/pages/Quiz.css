@@ -171,8 +171,8 @@
 /* Main Layout */
 .quiz-main-layout {
   display: grid;
-  grid-template-columns: 200px 1fr 350px;
-  gap: var(--spacing-lg);
+  grid-template-columns: 240px 1fr 380px;
+  gap: var(--spacing-xl);
   align-items: start;
 }
 
@@ -790,8 +790,8 @@
 /* Responsive Design */
 @media (max-width: 1400px) {
   .quiz-main-layout {
-    grid-template-columns: 180px 1fr 300px;
-    gap: var(--spacing-md);
+    grid-template-columns: 220px 1fr 340px;
+    gap: var(--spacing-lg);
   }
 }
 
