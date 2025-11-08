@@ -1,0 +1,217 @@
+.quiz-results-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.quiz-results-modal {
+  background: var(--color-white);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.quiz-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-xl);
+  border-bottom: 1px solid var(--color-gray);
+}
+
+.quiz-results-header h2 {
+  color: var(--color-navy);
+  font-size: 1.75rem;
+  margin: 0;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background-color: var(--color-gray-light);
+  color: var(--color-text-primary);
+}
+
+.quiz-results-content {
+  padding: var(--spacing-xl);
+}
+
+.performance-badge {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--color-periwinkle), var(--color-periwinkle-light));
+}
+
+.performance-badge.excellent {
+  background: linear-gradient(135deg, #10b981, #34d399);
+}
+
+.performance-badge.great {
+  background: linear-gradient(135deg, var(--color-periwinkle), var(--color-periwinkle-light));
+}
+
+.performance-badge.good {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+
+.performance-badge.needs-improvement {
+  background: linear-gradient(135deg, #ef4444, #f87171);
+}
+
+.performance-percentage {
+  font-size: 4rem;
+  font-weight: 700;
+  color: var(--color-white);
+  margin-bottom: var(--spacing-xs);
+  line-height: 1;
+}
+
+.performance-message {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-white);
+  opacity: 0.95;
+}
+
+.results-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.result-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--color-gray-light);
+  border-radius: var(--radius-lg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.result-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.result-stat-icon {
+  font-size: 2rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.result-stat-info {
+  flex: 1;
+}
+
+.result-stat-label {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.result-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.results-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.results-actions .btn {
+  min-width: 150px;
+}
+
+@media (max-width: 768px) {
+  .quiz-results-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .quiz-results-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .performance-percentage {
+    font-size: 3rem;
+  }
+
+  .performance-message {
+    font-size: 1.25rem;
+  }
+
+  .results-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .results-actions {
+    flex-direction: column;
+  }
+
+  .results-actions .btn {
+    width: 100%;
+  }
+}
+

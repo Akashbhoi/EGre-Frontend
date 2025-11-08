@@ -11,8 +11,14 @@
   --color-text-primary: #1e293b;
   --color-text-secondary: #64748b;
   --color-success: #10b981;
+  --color-success-light: #34d399;
+  --color-success-bg: #d1fae5;
   --color-error: #ef4444;
+  --color-error-light: #f87171;
+  --color-error-bg: #fee2e2;
   --color-warning: #f59e0b;
+  --color-warning-light: #fbbf24;
+  --color-warning-bg: #fef3c7;
 
   /* Spacing */
   --spacing-xs: 0.5rem;
