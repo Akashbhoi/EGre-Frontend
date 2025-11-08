@@ -787,7 +787,105 @@
   box-shadow: none;
 }
 
-/* Responsive Design */ix
+/* Mobile Chatbot Floating Button & Modal */
+.chatbot-floating-btn {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-periwinkle), var(--color-periwinkle-light));
+  color: var(--color-white);
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(107, 127, 215, 0.4);
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.chatbot-floating-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(107, 127, 215, 0.5);
+}
+
+.chatbot-floating-btn:active {
+  transform: scale(0.95);
+}
+
+.chatbot-mobile-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.chatbot-mobile-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 500px;
+  height: 80vh;
+  max-height: 700px;
+  background: var(--color-white);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.chatbot-mobile-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-gray-light);
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.chatbot-mobile-close:hover {
+  background: var(--color-gray);
+  transform: rotate(90deg);
+}
+
+/* Responsive Design */
 
 /* Large Desktop */
 @media (max-width: 1500px) {
@@ -843,6 +941,17 @@
 
   .quiz-container {
     padding: 0;
+  }
+
+  /* Show floating button on mobile */
+  .chatbot-floating-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .chatbot-mobile-overlay {
+    display: flex;
   }
 
   .quiz-top-bar {

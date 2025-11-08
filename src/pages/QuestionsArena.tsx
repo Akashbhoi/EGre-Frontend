@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import './QuestionsArena.css';
 
 interface QuestionSet {
@@ -12,6 +13,9 @@ interface QuestionSet {
 }
 
 const QuestionsArena = () => {
+  const [selectedTopic, setSelectedTopic] = useState('All Topics');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('All Difficulties');
+
   // Mock data - will be replaced with actual data fetching
   const questionSets: QuestionSet[] = [
     {
@@ -73,6 +77,13 @@ const QuestionsArena = () => {
   const topics = ['All Topics', 'Quantitative Reasoning', 'Verbal Reasoning', 'Analytical Writing'];
   const difficulties = ['All Difficulties', 'Easy', 'Medium', 'Hard'];
 
+  // Filter question sets based on selected filters
+  const filteredQuestionSets = questionSets.filter((set) => {
+    const topicMatch = selectedTopic === 'All Topics' || set.topic === selectedTopic;
+    const difficultyMatch = selectedDifficulty === 'All Difficulties' || set.difficulty === selectedDifficulty;
+    return topicMatch && difficultyMatch;
+  });
+
   return (
     <div className="questions-arena">
       <div className="container">
@@ -84,7 +95,11 @@ const QuestionsArena = () => {
         <div className="filters">
           <div className="filter-group">
             <label>Filter by Topic:</label>
-            <select className="filter-select">
+            <select
+              className="filter-select"
+              value={selectedTopic}
+              onChange={(e) => setSelectedTopic(e.target.value)}
+            >
               {topics.map((topic) => (
                 <option key={topic} value={topic}>
                   {topic}
@@ -94,7 +109,11 @@ const QuestionsArena = () => {
           </div>
           <div className="filter-group">
             <label>Filter by Difficulty:</label>
-            <select className="filter-select">
+            <select
+              className="filter-select"
+              value={selectedDifficulty}
+              onChange={(e) => setSelectedDifficulty(e.target.value)}
+            >
               {difficulties.map((difficulty) => (
                 <option key={difficulty} value={difficulty}>
                   {difficulty}
@@ -105,7 +124,7 @@ const QuestionsArena = () => {
         </div>
 
         <div className="question-sets-grid">
-          {questionSets.map((set) => {
+          {filteredQuestionSets.map((set) => {
             const progress = Math.round((set.completed / set.questionCount) * 100);
             
             return (

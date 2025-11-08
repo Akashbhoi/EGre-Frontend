@@ -38,6 +38,7 @@ const Quiz = () => {
   const [showResults, setShowResults] = useState(false);
   const [questionResults, setQuestionResults] = useState<QuestionResult[]>([]);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
+  const [showMobileChatbot, setShowMobileChatbot] = useState(false);
 
   useEffect(() => {
     if (setId) {
@@ -478,6 +479,31 @@ const Quiz = () => {
           onClose={handleCloseResults}
           onReview={handleReview}
         />
+      )}
+
+      {/* Mobile Chatbot Floating Button */}
+      <button
+        className="chatbot-floating-btn"
+        onClick={() => setShowMobileChatbot(true)}
+        aria-label="Open AI Assistant"
+      >
+        🤖
+      </button>
+
+      {/* Mobile Chatbot Modal */}
+      {showMobileChatbot && (
+        <div className="chatbot-mobile-overlay">
+          <div className="chatbot-mobile-container">
+            <button
+              className="chatbot-mobile-close"
+              onClick={() => setShowMobileChatbot(false)}
+              aria-label="Close AI Assistant"
+            >
+              ✕
+            </button>
+            <ChatBot />
+          </div>
+        </div>
       )}
     </div>
   );
