@@ -1,0 +1,126 @@
+.dashboard {
+  min-height: calc(100vh - 200px);
+}
+
+.page-title {
+  font-size: 2.5rem;
+  color: var(--color-navy);
+  margin-bottom: var(--spacing-xl);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.stat-card {
+  background: var(--color-white);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  border: 1px solid var(--color-gray);
+}
+
+.stat-card h3 {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: var(--spacing-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-periwinkle);
+  margin: 0;
+}
+
+.dashboard-actions {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+  flex-wrap: wrap;
+}
+
+.btn-small {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: 0.9rem;
+}
+
+.topics-section {
+  margin-top: var(--spacing-2xl);
+}
+
+.section-title {
+  font-size: 2rem;
+  color: var(--color-navy);
+  margin-bottom: var(--spacing-xl);
+}
+
+.topics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.topic-card {
+  background: var(--color-white);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-gray);
+}
+
+.topic-card h3 {
+  color: var(--color-navy);
+  margin-bottom: var(--spacing-md);
+  font-size: 1.25rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background-color: var(--color-gray);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: var(--spacing-md);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-periwinkle), var(--color-periwinkle-light));
+  border-radius: var(--radius-md);
+  transition: width 0.3s ease;
+}
+
+.topic-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-actions {
+    flex-direction: column;
+  }
+
+  .btn-large {
+    width: 100%;
+  }
+}
+

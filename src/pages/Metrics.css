@@ -1,0 +1,169 @@
+.metrics {
+  min-height: calc(100vh - 200px);
+}
+
+.overall-metrics,
+.topic-metrics,
+.session-metrics,
+.hint-breakdown {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.metric-card {
+  background: var(--color-white);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-gray);
+  text-align: center;
+}
+
+.metric-card h3 {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: var(--spacing-md);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-periwinkle);
+  margin-bottom: var(--spacing-md);
+}
+
+.topic-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.topic-metric-card {
+  background: var(--color-white);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-gray);
+}
+
+.topic-metric-card h3 {
+  color: var(--color-navy);
+  margin-bottom: var(--spacing-md);
+  font-size: 1.25rem;
+}
+
+.topic-metric-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.topic-stat {
+  text-align: center;
+}
+
+.topic-stat label {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.topic-stat p {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-periwinkle);
+  margin: 0;
+}
+
+.session-table-container {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-gray);
+  overflow-x: auto;
+  margin-top: var(--spacing-lg);
+}
+
+.session-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.session-table thead {
+  background-color: var(--color-gray-light);
+}
+
+.session-table th {
+  padding: var(--spacing-md);
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-navy);
+  border-bottom: 2px solid var(--color-gray);
+}
+
+.session-table td {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-gray);
+  color: var(--color-text-primary);
+}
+
+.session-table tbody tr:hover {
+  background-color: var(--color-gray-light);
+}
+
+.hint-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.hint-card {
+  background: var(--color-white);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-gray);
+  text-align: center;
+}
+
+.hint-card h3 {
+  color: var(--color-navy);
+  margin-bottom: var(--spacing-md);
+  font-size: 1.1rem;
+}
+
+.hint-count {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-periwinkle);
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .metrics-grid,
+  .topic-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .session-table-container {
+    overflow-x: scroll;
+  }
+
+  .topic-metric-stats {
+    grid-template-columns: 1fr;
+  }
+}
+

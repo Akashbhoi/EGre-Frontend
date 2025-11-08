@@ -1,0 +1,111 @@
+.profile {
+  min-height: calc(100vh - 200px);
+}
+
+.profile-content {
+  display: grid;
+  gap: var(--spacing-xl);
+  max-width: 900px;
+}
+
+.profile-card {
+  background: var(--color-white);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-gray);
+}
+
+.profile-card h2 {
+  color: var(--color-navy);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1.5rem;
+  border-bottom: 2px solid var(--color-periwinkle);
+  padding-bottom: var(--spacing-sm);
+}
+
+.profile-field {
+  margin-bottom: var(--spacing-lg);
+}
+
+.profile-field label {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: var(--spacing-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-field p {
+  color: var(--color-text-primary);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.level-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--color-periwinkle), var(--color-periwinkle-light));
+  color: var(--color-white);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-item label {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.stat-item .stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-periwinkle);
+  margin: 0;
+}
+
+.profile-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  font-size: 1.2rem;
+  color: var(--color-text-secondary);
+}
+
+.error {
+  color: var(--color-error);
+}
+
+@media (max-width: 768px) {
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-actions {
+    flex-direction: column;
+  }
+
+  .profile-actions .btn {
+    width: 100%;
+  }
+}
+
