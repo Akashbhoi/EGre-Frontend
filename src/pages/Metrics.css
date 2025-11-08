@@ -152,18 +152,172 @@
   margin: 0;
 }
 
+/* Tablet Responsive */
+@media (max-width: 1024px) {
+  .metrics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .topic-metrics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .hint-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
-  .metrics-grid,
+  .page-title {
+    font-size: 1.8rem;
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+  }
+
+  .metric-card {
+    padding: var(--spacing-md);
+  }
+
+  .metric-card h3 {
+    font-size: 0.8rem;
+  }
+
+  .metric-value {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+  }
+
   .topic-metrics-grid {
     grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+  }
+
+  .topic-metric-card {
+    padding: var(--spacing-lg);
+  }
+
+  .topic-metric-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .topic-metric-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+  }
+
+  .topic-stat label {
+    font-size: 0.8rem;
+  }
+
+  .topic-stat p {
+    font-size: 1.3rem;
   }
 
   .session-table-container {
-    overflow-x: scroll;
+    overflow-x: auto;
+    margin-top: var(--spacing-md);
+  }
+
+  .session-table th,
+  .session-table td {
+    padding: var(--spacing-sm);
+    font-size: 0.85rem;
+  }
+
+  .hint-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+  }
+
+  .hint-card {
+    padding: var(--spacing-md);
+  }
+
+  .hint-card h3 {
+    font-size: 1rem;
+  }
+
+  .hint-count {
+    font-size: 1.3rem;
+  }
+}
+
+/* Small Mobile Responsive */
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  .metric-card {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .metric-card h3 {
+    font-size: 0.75rem;
+  }
+
+  .metric-value {
+    font-size: 1.8rem;
+  }
+
+  .topic-metric-card {
+    padding: var(--spacing-md);
+  }
+
+  .topic-metric-card h3 {
+    font-size: 1rem;
   }
 
   .topic-metric-stats {
     grid-template-columns: 1fr;
   }
-}
 
+  .topic-stat p {
+    font-size: 1.2rem;
+  }
+
+  .session-table th,
+  .session-table td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.8rem;
+  }
+
+  .hint-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  .hint-card {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .hint-card h3 {
+    font-size: 0.95rem;
+  }
+
+  .hint-count {
+    font-size: 1.2rem;
+  }
+}

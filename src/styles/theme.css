@@ -63,7 +63,7 @@ body {
 
 /* Utility classes */
 .container {
-  max-width: 1500px;
+  max-width: 90%;
   margin: 0 auto;
   padding: 0 var(--spacing-lg);
 }

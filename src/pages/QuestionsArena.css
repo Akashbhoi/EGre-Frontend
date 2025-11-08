@@ -133,17 +133,124 @@
   text-align: center;
 }
 
-@media (max-width: 768px) {
+/* Tablet Responsive */
+@media (max-width: 1024px) {
+  .page-title {
+    font-size: 2.2rem;
+  }
+
   .question-sets-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+
+  .filters {
+    gap: var(--spacing-md);
+  }
+
+  .filter-select {
+    min-width: 180px;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 1.8rem;
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .page-subtitle {
+    font-size: 1rem;
+    margin-bottom: var(--spacing-lg);
   }
 
   .filters {
     flex-direction: column;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .filter-group {
+    width: 100%;
   }
 
   .filter-select {
     width: 100%;
+    min-width: 100%;
+    padding: var(--spacing-sm);
+    font-size: 0.95rem;
+  }
+
+  .question-sets-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .question-set-card {
+    padding: var(--spacing-lg);
+  }
+
+  .question-set-header h3 {
+    font-size: 1.3rem;
+  }
+
+  .question-set-topic {
+    font-size: 0.85rem;
+  }
+
+  .difficulty-badge {
+    font-size: 0.8rem;
+    padding: 4px var(--spacing-sm);
+  }
+
+  .question-set-description {
+    font-size: 0.95rem;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .progress-info {
+    font-size: 0.85rem;
   }
 }
 
+/* Small Mobile Responsive */
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .question-set-card {
+    padding: var(--spacing-md);
+  }
+
+  .question-set-header h3 {
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+  }
+
+  .question-set-topic {
+    font-size: 0.8rem;
+  }
+
+  .difficulty-badge {
+    font-size: 0.75rem;
+    padding: 3px var(--spacing-xs);
+  }
+
+  .question-set-description {
+    font-size: 0.9rem;
+  }
+
+  .progress-info {
+    font-size: 0.8rem;
+  }
+
+  .filter-select {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.9rem;
+  }
+}
