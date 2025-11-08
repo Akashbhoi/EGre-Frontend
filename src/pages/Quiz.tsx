@@ -4,6 +4,7 @@ import { getQuestionsForSet } from '../data/questions';
 import type { Question } from '../data/questions';
 import QuizResults from '../components/QuizResults';
 import Graph from '../components/Graph';
+import ChatBot from '../components/ChatBot';
 import './Quiz.css';
 
 interface QuestionResult {
@@ -459,6 +460,11 @@ const Quiz = () => {
                 )}
               </div>
             </div>
+          </div>
+
+          {/* AI ChatBot - Right Side */}
+          <div className="chatbot-sidebar">
+            <ChatBot />
           </div>
         </div>
       </div>

@@ -171,9 +171,15 @@
 /* Main Layout */
 .quiz-main-layout {
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 200px 1fr 350px;
   gap: var(--spacing-lg);
   align-items: start;
+}
+
+.chatbot-sidebar {
+  position: sticky;
+  top: var(--spacing-xl);
+  align-self: start;
 }
 
 /* Question Navigation Sidebar */
@@ -782,23 +788,25 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1400px) {
+  .quiz-main-layout {
+    grid-template-columns: 180px 1fr 300px;
+    gap: var(--spacing-md);
+  }
+}
+
 @media (max-width: 1024px) {
   .quiz-main-layout {
-    grid-template-columns: 180px 1fr;
+    grid-template-columns: 1fr 300px;
     gap: var(--spacing-md);
+  }
+
+  .question-nav-sidebar-fixed {
+    display: none;
   }
 
   .question-card-modern {
     width: 100%;
-  }
-
-  .question-nav-grid-fixed {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  .question-nav-item-fixed {
-    min-width: 32px;
-    font-size: 0.8rem;
   }
 }
 
@@ -816,14 +824,17 @@
     gap: var(--spacing-lg);
   }
 
-  .question-nav-sidebar-fixed {
+  .chatbot-sidebar {
     position: static;
-    max-height: none;
-    order: 1;
+    order: 3;
+  }
+
+  .question-nav-sidebar-fixed {
+    display: none;
   }
 
   .question-card-modern {
-    order: 2;
+    order: 1;
     max-width: 100%;
     min-height: auto;
     max-height: none;
