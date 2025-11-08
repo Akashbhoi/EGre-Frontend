@@ -188,8 +188,8 @@ const Quiz = () => {
   const handleUseHint = () => {
     if (!showHint) {
       setHintsUsed((prev) => new Set(prev).add(currentQuestionIndex));
-      setShowHint(true);
     }
+    setShowHint(!showHint);
   };
 
   const handleQuestionNavigation = (index: number) => {
@@ -362,10 +362,9 @@ const Quiz = () => {
                   <button
                     className="btn-hint-inline"
                     onClick={handleUseHint}
-                    disabled={showHint}
                   >
                     <span>💡</span>
-                    {showHint ? 'Hint Used' : 'Use Hint'}
+                    {showHint ? 'Close Hint' : 'Use Hint'}
                   </button>
                 )}
               </div>
