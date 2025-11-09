@@ -1,15 +1,5 @@
-import './QuizResults.css';
 
-interface QuizResultsProps {
-  score: number;
-  totalQuestions: number;
-  timeTaken: number;
-  hintsUsed: number;
-  onClose: () => void;
-  onReview: () => void;
-}
-
-const QuizResults = ({ score, totalQuestions, timeTaken, hintsUsed, onClose, onReview }: QuizResultsProps) => {
+const QuizResults = ({ score, totalQuestions, timeTaken, hintsUsed, onClose }) => {
   const percentage = Math.round((score / totalQuestions) * 100);
   const accuracy = percentage;
   const averageTime = Math.round(timeTaken / totalQuestions);
@@ -80,11 +70,8 @@ const QuizResults = ({ score, totalQuestions, timeTaken, hintsUsed, onClose, onR
           </div>
 
           <div className="results-actions">
-            <button className="btn btn-secondary" onClick={onReview}>
-              Review Answers
-            </button>
             <button className="btn btn-primary" onClick={onClose}>
-              Continue Practice
+              Submit Quiz
             </button>
           </div>
         </div>
@@ -94,4 +81,3 @@ const QuizResults = ({ score, totalQuestions, timeTaken, hintsUsed, onClose, onR
 };
 
 export default QuizResults;
-

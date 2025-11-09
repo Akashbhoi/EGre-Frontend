@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import './Landing.css';
 
 const Landing = () => {
   return (
@@ -45,4 +44,3 @@ const Landing = () => {
 };
 
 export default Landing;
-

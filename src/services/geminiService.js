@@ -1,7 +1,7 @@
 const API_KEYS = (import.meta.env.VITE_GEMINI_API_KEYS || '')
   .split(',')
-  .map((key: string) => key.trim())
-  .filter((key: string) => key);
+  .map((key) => key.trim())
+  .filter((key) => key);
 
 let currentApiKeyIndex = 0;
 
@@ -18,7 +18,7 @@ const SYSTEM_PROMPT = `You are a helpful GRE study assistant. Your role is to:
 Keep your responses concise, clear, and educational. Be friendly and supportive.`;
 
 // Use REST API directly to avoid v1beta issues
-const callGeminiAPI = async (prompt: string, apiKey: string): Promise<string> => {
+const callGeminiAPI = async (prompt, apiKey) => {
   const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${apiKey}`;
 
   const response = await fetch(url, {
@@ -44,7 +44,7 @@ const callGeminiAPI = async (prompt: string, apiKey: string): Promise<string> =>
   return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated';
 };
 
-const callGeminiWithRotation = async (prompt: string): Promise<string> => {
+const callGeminiWithRotation = async (prompt) => {
   if (API_KEYS.length === 0) {
     throw new Error('API keys not configured');
   }
@@ -71,7 +71,7 @@ const callGeminiWithRotation = async (prompt: string): Promise<string> => {
 };
 
 // Send a message to Gemini and get a response
-export const sendMessageToGemini = async (userMessage: string, questionContext: string): Promise<string> => {
+export const sendMessageToGemini = async (userMessage, questionContext) => {
   if (API_KEYS.length === 0) {
     return "I'm having trouble connecting right now. Please make sure the API key is configured correctly.";
   }
@@ -95,7 +95,7 @@ export const sendMessageToGemini = async (userMessage: string, questionContext: 
     if (message.includes('API key') || message.includes('API_KEY_INVALID')) {
       return 'API key error. Please check your configuration in Google AI Studio.';
     }
-    
+
     if (message.includes('All API keys failed')) {
       return "I'm having trouble responding right now. Please try again in a moment.";
     }
@@ -105,7 +105,7 @@ export const sendMessageToGemini = async (userMessage: string, questionContext: 
 };
 
 // Get a contextual hint for a question
-export const getQuestionHint = async (question: string, options: string[]): Promise<string> => {
+export const getQuestionHint = async (question, options) => {
   if (API_KEYS.length === 0) {
     return "Hints are temporarily unavailable.";
   }
@@ -129,9 +129,10 @@ Provide a brief hint that helps the student think through the problem without gi
     if (message.includes('All API keys failed')) {
       return "Sorry, I couldn't get a hint for you right now. Please try again in a moment.";
     }
-    
+
     return "Could not fetch a hint at this time. Please try again later.";
   }
 };
 
 export default { sendMessageToGemini, getQuestionHint };
+

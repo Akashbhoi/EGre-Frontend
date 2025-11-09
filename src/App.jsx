@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Layout from './components/Layout';
-import Landing from './pages/Landing';
-import Dashboard from './pages/Dashboard';
-import Profile from './pages/Profile';
-import Metrics from './pages/Metrics';
-import QuestionsArena from './pages/QuestionsArena';
-import Quiz from './pages/Quiz';
+import Layout from './components/Layout.jsx';
+import Landing from './pages/Landing.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import Profile from './pages/Profile.jsx';
+import Metrics from './pages/Metrics.jsx';
+import QuestionsArena from './pages/QuestionsArena.jsx';
+import Quiz from './pages/Quiz.jsx';
 import './styles/theme.css';
 
 function App() {

@@ -1,5 +1,4 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import './Layout.css';
 
 const Layout = () => {
   const location = useLocation();
@@ -48,4 +47,3 @@ const Layout = () => {
 };
 
 export default Layout;
-

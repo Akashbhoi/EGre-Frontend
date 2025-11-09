@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import './Dashboard.css';
 
 const Dashboard = () => {
   // Mock data - will be replaced with actual data fetching
@@ -83,4 +82,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

@@ -1,54 +1,42 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getQuestionsForSet } from '../data/questions';
-import type { Question } from '../data/questions';
-import { generateQuizQuestions } from '../services/aiService';
-import QuizResults from '../components/QuizResults';
-import Graph from '../components/Graph';
-import ChatBot from '../components/ChatBot';
-import Calculator from '../components/Calculator';
-import './Quiz.css';
-
-interface QuestionResult {
-  questionId: string;
-  selectedAnswer: number;
-  correctAnswer: number;
-  isCorrect: boolean;
-  timeTaken: number;
-  hintUsed: boolean;
-}
+import { getQuestionsForSet } from '../data/questions.js';
+import { generateQuizQuestions } from '../services/aiService.js';
+import QuizResults from '../components/QuizResults.jsx';
+import Graph from '../components/Graph.jsx';
+import ChatBot from '../components/ChatBot.jsx';
+import Calculator from '../components/Calculator.jsx';
 
 const Quiz = () => {
-  const { setId } = useParams<{ setId: string }>();
+  const { setId } = useParams();
   const navigate = useNavigate();
   
   // Quiz Mode: 'practice' shows correct/wrong immediately, 'exam' hides until end
-  const [quizMode, setQuizMode] = useState<'practice' | 'exam'>('practice');
+  const [quizMode, setQuizMode] = useState('practice');
 
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showExplanation, setShowExplanation] = useState(false);
-  const [hintsUsed, setHintsUsed] = useState<Set<number>>(new Set());
+  const [hintsUsed, setHintsUsed] = useState(new Set());
   const [showHint, setShowHint] = useState(false);
-  const [timeStarted] = useState<number>(Date.now());
-  const [questionTimeStart, setQuestionTimeStart] = useState<number>(Date.now());
-  const [questionTimes, setQuestionTimes] = useState<number[]>([]);
+  const [timeStarted] = useState(Date.now());
+  const [questionTimeStart, setQuestionTimeStart] = useState(Date.now());
+  const [questionTimes, setQuestionTimes] = useState([]);
   const [currentQuestionTime, setCurrentQuestionTime] = useState(0);
   const [totalQuizTime, setTotalQuizTime] = useState(0);
-  const [scores, setScores] = useState<{ correct: number; total: number }>({
-    correct: 0,
-    total: 0,
-  });
+  const [scores, setScores] = useState({ correct: 0, total: 0 });
   const [showResults, setShowResults] = useState(false);
-  const [questionResults, setQuestionResults] = useState<QuestionResult[]>([]);
-  const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
+  const [questionResults, setQuestionResults] = useState([]);
+  const [answeredQuestions, setAnsweredQuestions] = useState(new Set());
   const [showMobileChatbot, setShowMobileChatbot] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [markedForReview, setMarkedForReview] = useState<Set<number>>(new Set());
-  const [questionNotes, setQuestionNotes] = useState<Map<number, string>>(new Map());
+  const [markedForReview, setMarkedForReview] = useState(new Set());
+  const [questionNotes, setQuestionNotes] = useState(new Map());
   const [showNotes, setShowNotes] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
+  // Track answer history for undo functionality - Map<questionIndex, previousState>
+  const [answerHistory, setAnswerHistory] = useState(new Map());
 
   useEffect(() => {
     const loadQuestions = async () => {
@@ -62,10 +50,21 @@ const Quiz = () => {
           
           const aiQuestions = await generateQuizQuestions('Quantitative Reasoning', 10, 'groq');
           
-          setQuestions(aiQuestions as Question[]);
-          setQuestionTimeStart(Date.now());
-          setQuestionTimes(new Array(aiQuestions.length).fill(0));
-          setIsGenerating(false);
+          // Check if AI questions were successfully generated
+          if (Array.isArray(aiQuestions) && aiQuestions.length > 0) {
+            setQuestions(aiQuestions);
+            setQuestionTimeStart(Date.now());
+            setQuestionTimes(new Array(aiQuestions.length).fill(0));
+            setIsGenerating(false);
+          } else {
+            // Fallback to static questions if AI failed or returned empty
+            console.warn('AI question generation failed or returned empty, falling back to static questions');
+            const staticQuestions = getQuestionsForSet(setId);
+            setQuestions(staticQuestions);
+            setQuestionTimeStart(Date.now());
+            setQuestionTimes(new Array(staticQuestions.length).fill(0));
+            setIsGenerating(false);
+          }
         } catch (error) {
           console.error('Failed to generate questions:', error);
           
@@ -113,15 +112,31 @@ const Quiz = () => {
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
   const isFirstQuestion = currentQuestionIndex === 0;
-  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+  const progress = questions.length > 0 ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
 
-  const handleAnswerSelect = (index: number) => {
+  const handleAnswerSelect = (index) => {
     if (showExplanation) return;
     setSelectedAnswer(index);
   };
 
   const handleSubmitAnswer = () => {
     if (selectedAnswer === null || !currentQuestion) return;
+
+    // Save current state before submitting (for undo)
+    const previousState = {
+      selectedAnswer,
+      showExplanation,
+      wasAnswered: answeredQuestions.has(currentQuestionIndex),
+      previousResult: questionResults.find(r => r.questionId === currentQuestion.id),
+      previousScores: { ...scores },
+      previousTime: questionTimes[currentQuestionIndex],
+    };
+
+    setAnswerHistory((prev) => {
+      const newHistory = new Map(prev);
+      newHistory.set(currentQuestionIndex, previousState);
+      return newHistory;
+    });
 
     const timeTaken = currentQuestionTime;
     const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
@@ -130,7 +145,7 @@ const Quiz = () => {
     newQuestionTimes[currentQuestionIndex] = timeTaken;
     setQuestionTimes(newQuestionTimes);
 
-    const result: QuestionResult = {
+    const result = {
       questionId: currentQuestion.id,
       selectedAnswer,
       correctAnswer: currentQuestion.correctAnswer,
@@ -173,7 +188,7 @@ const Quiz = () => {
     
     const timeTaken = currentQuestionTime;
     const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
-    const result: QuestionResult = {
+    const result = {
       questionId: currentQuestion.id,
       selectedAnswer,
       correctAnswer: currentQuestion.correctAnswer,
@@ -229,10 +244,49 @@ const Quiz = () => {
     navigate('/questions');
   };
 
-  const handleReview = () => {
-    setShowResults(false);
-    setCurrentQuestionIndex(0);
-    setShowExplanation(true);
+  const handleUndoAnswer = () => {
+    const previousState = answerHistory.get(currentQuestionIndex);
+    if (!previousState) return;
+
+    // Restore the previous state
+    setSelectedAnswer(previousState.selectedAnswer);
+    setShowExplanation(previousState.showExplanation);
+
+    // Remove from answered questions if it wasn't answered before
+    if (!previousState.wasAnswered) {
+      setAnsweredQuestions((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(currentQuestionIndex);
+        return newSet;
+      });
+    }
+
+    // Restore question results
+    setQuestionResults((prev) => {
+      if (previousState.previousResult) {
+        // Restore the previous result
+        const filtered = prev.filter(r => r.questionId !== currentQuestion.id);
+        return [...filtered, previousState.previousResult];
+      } else {
+        // Remove the result entirely
+        return prev.filter(r => r.questionId !== currentQuestion.id);
+      }
+    });
+
+    // Restore scores
+    setScores(previousState.previousScores);
+
+    // Restore question time
+    const newQuestionTimes = [...questionTimes];
+    newQuestionTimes[currentQuestionIndex] = previousState.previousTime || 0;
+    setQuestionTimes(newQuestionTimes);
+
+    // Remove from history after undo
+    setAnswerHistory((prev) => {
+      const newHistory = new Map(prev);
+      newHistory.delete(currentQuestionIndex);
+      return newHistory;
+    });
   };
 
   const handleUseHint = () => {
@@ -262,8 +316,7 @@ const Quiz = () => {
     });
   };
 
-
-  const handleNoteChange = (note: string) => {
+  const handleNoteChange = (note) => {
     setQuestionNotes((prev) => {
       const newMap = new Map(prev);
       if (note.trim() === '') {
@@ -275,7 +328,7 @@ const Quiz = () => {
     });
   };
 
-  const handleQuestionNavigation = (index: number) => {
+  const handleQuestionNavigation = (index) => {
     if (index === currentQuestionIndex) return;
     
     // Save current answer if navigating away
@@ -303,7 +356,7 @@ const Quiz = () => {
     setCurrentQuestionTime(0);
   }, [currentQuestionIndex, currentQuestion, questionResults, hintsUsed, quizMode]);
 
-  const formatTime = (seconds: number) => {
+  const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
@@ -399,11 +452,12 @@ const Quiz = () => {
           <div className="quiz-progress-bar">
             <div
               className="quiz-progress-fill"
-              style={{ width: `${progress}%` }}
+              style={{ width: `${Math.round(progress)}%` }}
             ></div>
           </div>
           <div className="quiz-progress-percentage">{Math.round(progress)}%</div>
         </div>
+
 
         <div className="quiz-main-layout">
           {/* Question Navigation Sidebar - Left Side */}
@@ -517,6 +571,16 @@ const Quiz = () => {
                   <span className="tool-icon">🔢</span>
                   <span className="tool-text">Calculator</span>
                 </button>
+                {answerHistory.has(currentQuestionIndex) && (
+                  <button
+                    className="btn-tool-compact btn-undo"
+                    onClick={handleUndoAnswer}
+                    title="Undo last answer"
+                  >
+                    <span className="tool-icon">↩️</span>
+                    <span className="tool-text">Undo</span>
+                  </button>
+                )}
                 {!showExplanation && (
                   <button
                     className="btn-tool-compact btn-skip"
@@ -699,7 +763,6 @@ const Quiz = () => {
           timeTaken={totalQuizTime}
           hintsUsed={hintsUsed.size}
           onClose={handleCloseResults}
-          onReview={handleReview}
         />
       )}
 

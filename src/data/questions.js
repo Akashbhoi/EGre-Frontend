@@ -1,25 +1,7 @@
-// Question database with 10 questions per topic
-
-export interface Question {
-  id: string;
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation: string;
-  topic: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  hint?: string;
-  hasGraph?: boolean;
-  graphData?: {
-    equation: string;
-    type: 'quadratic' | 'linear' | 'exponential';
-    highlightPoints?: Array<{ x: number; y: number; label?: string }>;
-    hideEquation?: boolean;
-  };
-}
+// Question database with 10 questions per topic (JavaScript version)
 
 // Quantitative Reasoning Questions
-const quantitativeQuestions: Question[] = [
+const quantitativeQuestions = [
   {
     id: 'q1',
     question: 'If x + 5 = 12, what is the value of x?',
@@ -110,176 +92,170 @@ const quantitativeQuestions: Question[] = [
     explanation: 'If log₂(x) = 4, then x = 2⁴ = 16',
     topic: 'Algebra',
     difficulty: 'Medium',
-    hint: 'Remember that log_b(a) = c means b^c = a.',
+    hint: 'Recall that log base 2 of x equals 4 means 2 raised to the power of 4 equals x.',
   },
   {
     id: 'q9',
-    question: 'If f(x) = x² + 3x - 2, what is f(-1)?',
-    options: ['-4', '-2', '0', '2'],
-    correctAnswer: 0,
-    explanation: 'f(-1) = (-1)² + 3(-1) - 2 = 1 - 3 - 2 = -4',
+    question: 'What is the value of (3x² - 2x + 1) - (x² + x - 4)?',
+    options: ['2x² - 3x + 5', '2x² - 3x - 3', '2x² - 3x + 3', '2x² + 3x + 5'],
+    correctAnswer: 2,
+    explanation: 'Subtract term by term: (3x² - x²) + (-2x - x) + (1 - (-4)) = 2x² - 3x + 5',
     topic: 'Algebra',
     difficulty: 'Medium',
-    hint: 'Substitute -1 for x in the function and simplify.',
+    hint: 'Be careful with signs when subtracting polynomials.',
   },
   {
     id: 'q10',
-    question: `The graph above shows the function f(x) = x² - 4x + 3 for all real values of x.
-
-Consider the following statements about the graph:
-I. The function has a minimum value of -1 at x = 2
-II. The function is decreasing on the interval (-∞, 2) and increasing on the interval (2, ∞)
-III. The function f(x) = 0 has exactly two real solutions
-
-Based on the graph and the properties of quadratic functions, which of the following statements must be true?`,
-    options: [
-      'I only',
-      'II only',
-      'I and II only',
-      'I, II, and III',
-    ],
-    correctAnswer: 3,
-    explanation: `All three statements are true for the quadratic function f(x) = x² - 4x + 3.
-
-Statement I: Since the parabola opens upward (coefficient of x² is positive), the vertex represents the minimum point. The vertex is at (2, -1), so the minimum value is -1 at x = 2. ✓
-
-Statement II: For a quadratic function that opens upward, the function decreases from -∞ to the x-coordinate of the vertex, and increases from the x-coordinate of the vertex to ∞. Since the vertex is at x = 2, the function is decreasing on (-∞, 2) and increasing on (2, ∞). ✓
-
-Statement III: The function f(x) = 0 means we need to find where the graph intersects the x-axis. The graph shows intersections at x = 1 and x = 3. We can verify: f(1) = 1² - 4(1) + 3 = 0 and f(3) = 3² - 4(3) + 3 = 0. Since this is a quadratic function, it can have at most 2 real roots, and we have exactly 2. ✓
-
-Therefore, all three statements are true.`,
-    topic: 'Coordinate Geometry',
-    difficulty: 'Hard',
-    hint: 'For a quadratic function f(x) = ax² + bx + c where a > 0, the vertex is the minimum point. The function decreases before the vertex and increases after it. The number of x-intercepts equals the number of real solutions to f(x) = 0.',
-    hasGraph: true,
-    graphData: {
-      equation: 'x^2 - 4x + 3',
-      type: 'quadratic',
-      highlightPoints: [
-        { x: 1, y: 0, label: 'A' },
-        { x: 2, y: -1, label: 'Vertex' },
-        { x: 3, y: 0, label: 'B' },
-        { x: 0, y: 3, label: 'C' },
-      ],
-    },
+    question: 'If f(x) = 2x + 3, what is f(5)?',
+    options: ['10', '13', '15', '23'],
+    correctAnswer: 1,
+    explanation: 'f(5) = 2(5) + 3 = 13',
+    topic: 'Functions',
+    difficulty: 'Easy',
+    hint: 'Plug 5 into the function and simplify.',
   },
 ];
 
 // Verbal Reasoning Questions
-const verbalQuestions: Question[] = [
+const verbalQuestions = [
   {
     id: 'v1',
-    question: 'Choose the word that is most similar in meaning to "ABUNDANT":',
-    options: ['Scarce', 'Plentiful', 'Rare', 'Limited'],
+    question: 'Choose the word that best completes the sentence: The professor’s lectures were so ____ that students found it hard to stay engaged.',
+    options: ['engaging', 'verbose', 'succinct', 'riveting'],
     correctAnswer: 1,
-    explanation: '"Abundant" means existing in large quantities, which is synonymous with "plentiful".',
-    topic: 'Vocabulary',
-    difficulty: 'Easy',
-    hint: 'Think of words that mean "a lot" or "many".',
+    explanation: 'Verbose means using more words than needed, making lectures potentially dull.',
+    topic: 'Text Completion',
+    difficulty: 'Medium',
+    hint: 'Think about a word that means overly wordy or long-winded.',
   },
   {
     id: 'v2',
-    question: 'The politician\'s speech was so _____ that many audience members fell asleep.',
-    options: ['Eloquent', 'Tedious', 'Inspirational', 'Concise'],
+    question: 'Which of the following is the most similar in meaning to “abate”?',
+    options: ['increase', 'diminish', 'provoke', 'sustain'],
     correctAnswer: 1,
-    explanation: '"Tedious" means boring and monotonous, which explains why people fell asleep.',
-    topic: 'Sentence Completion',
+    explanation: 'Abate means to lessen or reduce.',
+    topic: 'Vocabulary',
     difficulty: 'Easy',
-    hint: 'Consider what quality of a speech would cause people to fall asleep.',
+    hint: 'Consider synonyms related to reduction.',
   },
   {
     id: 'v3',
-    question: 'Choose the word that is most opposite in meaning to "EPHEMERAL":',
-    options: ['Temporary', 'Transient', 'Permanent', 'Brief'],
-    correctAnswer: 2,
-    explanation: '"Ephemeral" means lasting for a very short time, so its opposite is "permanent".',
-    topic: 'Vocabulary',
-    difficulty: 'Easy',
-    hint: 'Think of words that mean "lasting forever" or "never-ending".',
+    question: 'The author’s tone in the passage can best be described as:',
+    options: ['objective', 'sarcastic', 'optimistic', 'melancholic'],
+    correctAnswer: 0,
+    explanation: 'The author presents facts without personal bias, indicating an objective tone.',
+    topic: 'Reading Comprehension',
+    difficulty: 'Medium',
+    hint: 'Look for neutrality and lack of emotional language.',
   },
   {
     id: 'v4',
-    question: 'Despite his initial _____, the student eventually mastered the complex mathematical concept.',
-    options: ['Confidence', 'Understanding', 'Confusion', 'Expertise'],
-    correctAnswer: 2,
-    explanation: 'The word "despite" indicates a contrast. The student eventually mastered it, so initially they were "confused".',
-    topic: 'Sentence Completion',
-    difficulty: 'Medium',
-    hint: 'Look for a contrast word and think about what state would contrast with "mastered".',
+    question: 'Select the pair of words that complete the sentence: The committee’s decision was both ____ and ____, leaving many members dissatisfied.',
+    options: [
+      'prudent / fair',
+      'arbitrary / opaque',
+      'unanimous / transparent',
+      'thoughtful / considerate',
+    ],
+    correctAnswer: 1,
+    explanation: 'Arbitrary and opaque suggest a decision made without clear reasoning and lacking transparency.',
+    topic: 'Sentence Equivalence',
+    difficulty: 'Hard',
+    hint: 'Think of negative traits that often go together in poor decision-making.',
   },
   {
     id: 'v5',
-    question: 'The scientist\'s research was _____, providing groundbreaking insights into the field.',
-    options: ['Superficial', 'Pioneering', 'Derivative', 'Obsolete'],
+    question: 'Which statement is best supported by the passage?',
+    options: [
+      'The author believes that technology only creates problems.',
+      'The author presents both benefits and drawbacks of technology.',
+      'The author prefers traditional methods over modern technology.',
+      'The author argues that technology will inevitably replace human labor.',
+    ],
     correctAnswer: 1,
-    explanation: '"Pioneering" means innovative and original, which aligns with "groundbreaking insights".',
-    topic: 'Vocabulary',
+    explanation: 'The passage discusses both positive and negative aspects, showing a balanced viewpoint.',
+    topic: 'Reading Comprehension',
     difficulty: 'Medium',
-    hint: 'Think of words that mean "new" or "innovative".',
+    hint: 'Look for phrases that indicate balance or contrast.',
   },
   {
     id: 'v6',
-    question: 'The author\'s writing style is characterized by its _____, making complex topics accessible to general readers.',
-    options: ['Obscurity', 'Clarity', 'Ambiguity', 'Complexity'],
-    correctAnswer: 1,
-    explanation: 'If complex topics are made "accessible", the writing must have "clarity".',
-    topic: 'Sentence Completion',
-    difficulty: 'Medium',
-    hint: 'Consider what quality would help make complex topics easier to understand.',
+    question: 'Choose the word that is most opposite in meaning to “loquacious”.',
+    options: ['silent', 'talkative', 'amiable', 'reluctant'],
+    correctAnswer: 0,
+    explanation: 'Loquacious means very talkative; the opposite is silent.',
+    topic: 'Vocabulary',
+    difficulty: 'Easy',
+    hint: 'Think of the direct antonym of talkative.',
   },
   {
     id: 'v7',
-    question: 'Choose the word that best completes: "Her argument was so _____ that it convinced even the most skeptical critics."',
-    options: ['Weak', 'Compelling', 'Flawed', 'Unsubstantiated'],
+    question: 'Which option best captures the main idea of the passage?',
+    options: [
+      'Technological innovation always improves society.',
+      'Balancing innovation with ethics is crucial for society.',
+      'Government should control all innovation.',
+      'Ethics is irrelevant in technological progress.',
+    ],
     correctAnswer: 1,
-    explanation: 'If it convinced skeptical critics, the argument must have been "compelling" (forceful and persuasive).',
-    topic: 'Sentence Completion',
+    explanation: 'The passage emphasizes the importance of ethics alongside innovation.',
+    topic: 'Reading Comprehension',
     difficulty: 'Medium',
-    hint: 'Think of qualities that would convince skeptical people.',
+    hint: 'Look for the overarching theme rather than specific details.',
   },
   {
     id: 'v8',
-    question: 'The word "MALEVOLENT" most closely means:',
-    options: ['Kind', 'Harmful', 'Neutral', 'Beneficial'],
+    question: 'Select the pair that best completes the sentence: Her remarks were so ____ and ____ that the audience remained unconvinced.',
+    options: ['coherent / persuasive', 'vague / contradictory', 'lucid / insightful', 'concise / direct'],
     correctAnswer: 1,
-    explanation: '"Malevolent" means having or showing a wish to do evil to others, which is synonymous with "harmful".',
-    topic: 'Vocabulary',
-    difficulty: 'Medium',
-    hint: 'The prefix "mal-" often indicates something bad or evil.',
+    explanation: 'Vague and contradictory would undermine her credibility.',
+    topic: 'Sentence Equivalence',
+    difficulty: 'Hard',
+    hint: 'Think of two negative descriptors that commonly appear together.',
   },
   {
     id: 'v9',
-    question: 'Despite numerous setbacks, the entrepreneur remained _____, always looking for new opportunities.',
-    options: ['Defeated', 'Resilient', 'Pessimistic', 'Surrendered'],
+    question: 'The word “pragmatic” most nearly means:',
+    options: ['idealistic', 'practical', 'theoretical', 'impractical'],
     correctAnswer: 1,
-    explanation: '"Resilient" means able to recover quickly from difficulties, which describes someone who doesn\'t give up despite setbacks.',
-    topic: 'Sentence Completion',
-    difficulty: 'Hard',
-    hint: 'Think of personality traits that help people persist through difficulties.',
+    explanation: 'Pragmatic means dealing with things sensibly and realistically.',
+    topic: 'Vocabulary',
+    difficulty: 'Easy',
+    hint: 'Think of a word associated with real-world problem-solving.',
   },
   {
     id: 'v10',
-    question: 'The professor\'s lecture was both _____ and _____, combining depth of knowledge with engaging presentation.',
-    options: ['Superficial; boring', 'Rigorous; captivating', 'Shallow; monotonous', 'Incomplete; dull'],
+    question: 'Which inference is most strongly supported by the passage?',
+    options: [
+      'The author rejects all forms of scientific research.',
+      'The author believes that responsible research benefits society.',
+      'The author argues that science and ethics are incompatible.',
+      'The author thinks funding for science should be reduced.',
+    ],
     correctAnswer: 1,
-    explanation: '"Rigorous" (thorough and accurate) and "captivating" (fascinating) best match "depth of knowledge" and "engaging presentation".',
-    topic: 'Sentence Completion',
-    difficulty: 'Hard',
-    hint: 'Look for words that match both "depth of knowledge" and "engaging presentation".',
+    explanation: 'The author supports research that is conducted responsibly.',
+    topic: 'Reading Comprehension',
+    difficulty: 'Medium',
+    hint: 'Look for statements that align with cautious support.',
   },
 ];
 
-// Analytical Writing Questions (these are essay prompts, formatted as questions)
-const analyticalWritingQuestions: Question[] = [
+// Analytical Writing Questions (converted to multiple-choice style prompts)
+const analyticalWritingQuestions = [
   {
     id: 'a1',
-    question: 'Issue Essay: "The primary goal of education should be to prepare students for the workforce rather than to develop their intellectual curiosity."',
-    options: ['Strongly Agree', 'Agree', 'Neutral', 'Disagree'],
-    correctAnswer: 3,
-    explanation: 'This is an essay prompt. You should analyze both sides, provide examples, and develop a well-reasoned argument. Consider the value of intellectual curiosity versus practical skills.',
-    topic: 'Issue Essay',
+    question: 'Which of the following is the best approach to analyze the argument: "Increasing funding for public transportation will reduce traffic congestion"?',
+    options: [
+      'Accept the claim as true without evaluating assumptions',
+      'Identify assumptions, evaluate evidence, and consider alternative explanations',
+      'Focus only on economic implications',
+      'Discuss the environmental benefits only',
+    ],
+    correctAnswer: 1,
+    explanation: 'You should identify hidden assumptions, evaluate the evidence provided, and consider alternative explanations that might also reduce congestion.',
+    topic: 'Argument Analysis',
     difficulty: 'Medium',
-    hint: 'Consider the long-term benefits of intellectual curiosity versus immediate workforce preparation.',
+    hint: 'Think about what assumptions the argument makes and how to test them.',
   },
   {
     id: 'a2',
@@ -374,7 +350,7 @@ const analyticalWritingQuestions: Question[] = [
 ];
 
 // Question sets by topic
-export const questionSets: Record<string, Question[]> = {
+export const questionSets = {
   'quantitative-reasoning': quantitativeQuestions,
   'verbal-reasoning': verbalQuestions,
   'analytical-writing': analyticalWritingQuestions,
@@ -388,9 +364,9 @@ export const questionSets: Record<string, Question[]> = {
 };
 
 // Get questions for a specific set
-export const getQuestionsForSet = (setId: string): Question[] => {
+export const getQuestionsForSet = (setId) => {
   // Map set IDs to question sets
-  const setIdMap: Record<string, string> = {
+  const setIdMap = {
     '1': 'quantitative-reasoning',
     '2': 'quantitative-reasoning',
     '3': 'verbal-reasoning',

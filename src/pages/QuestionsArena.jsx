@@ -1,23 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import './QuestionsArena.css';
-
-interface QuestionSet {
-  id: string;
-  name: string;
-  topic: string;
-  difficulty: string;
-  questionCount: number;
-  completed: number;
-  description: string;
-}
 
 const QuestionsArena = () => {
   const [selectedTopic, setSelectedTopic] = useState('All Topics');
   const [selectedDifficulty, setSelectedDifficulty] = useState('All Difficulties');
 
   // Mock data - will be replaced with actual data fetching
-  const questionSets: QuestionSet[] = [
+  const questionSets = [
     {
       id: '1',
       name: 'Algebra Basics',
@@ -167,4 +156,3 @@ const QuestionsArena = () => {
 };
 
 export default QuestionsArena;
-

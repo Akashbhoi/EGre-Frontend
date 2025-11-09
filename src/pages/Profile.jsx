@@ -1,23 +1,11 @@
 import { useEffect, useState } from 'react';
-import './Profile.css';
-
-interface ProfileData {
-  name: string;
-  email: string;
-  joinDate: string;
-  totalQuestions: number;
-  completedQuizzes: number;
-  averageScore: number;
-  level: string;
-}
 
 const Profile = () => {
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Simulate fetching profile data
-    // TODO: Replace with actual API call
     const fetchProfile = async () => {
       setLoading(true);
       // Simulate API delay
@@ -115,4 +103,3 @@ const Profile = () => {
 };
 
 export default Profile;
-

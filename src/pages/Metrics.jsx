@@ -1,4 +1,3 @@
-import './Metrics.css';
 
 const Metrics = () => {
   // Mock data - will be replaced with actual data fetching
@@ -158,4 +157,3 @@ const Metrics = () => {
 };
 
 export default Metrics;
-
