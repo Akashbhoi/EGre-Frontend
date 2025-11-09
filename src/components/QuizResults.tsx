@@ -65,7 +65,7 @@ const QuizResults = ({ score, totalQuestions, timeTaken, hintsUsed, onClose, onR
             <div className="result-stat">
               <div className="result-stat-icon">⚡</div>
               <div className="result-stat-info">
-                <div className="result-stat-label">Avg Time/Question</div>
+                <div className="result-stat-label">Avg Time</div>
                 <div className="result-stat-value">{averageTime}s</div>
               </div>
             </div>

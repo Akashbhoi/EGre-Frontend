@@ -1,4 +1,4 @@
-export type AIProvider = 'gemini' | 'openai' | 'groq';
+export type AIProvider = 'gemini' | 'openai' | 'groq' | 'openrouter';
 
 // System prompt for GRE study assistant
 const SYSTEM_PROMPT = `You are a helpful GRE study assistant. Your role is to:
@@ -25,6 +25,9 @@ const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY || '';
 
 // Groq Configuration
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || '';
+
+// OpenRouter Configuration
+const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || '';
 
 // Gemini API call
 const callGeminiAPI = async (prompt: string, apiKey: string): Promise<string> => {
@@ -148,6 +151,72 @@ const callGroq = async (prompt: string): Promise<string> => {
   return data.choices?.[0]?.message?.content || 'No response generated';
 };
 
+// Groq API call with custom temperature
+const callGroqWithTemperature = async (prompt: string, temperature: number = 0.7): Promise<string> => {
+  if (!GROQ_API_KEY) {
+    throw new Error('Groq API key not configured');
+  }
+
+  const url = 'https://api.groq.com/openai/v1/chat/completions';
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'user', content: prompt }
+      ],
+      temperature: temperature,
+      max_tokens: 4000,
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(`Groq API Error: ${response.status} - ${JSON.stringify(errorData)}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || 'No response generated';
+};
+
+// OpenRouter API call
+const callOpenRouter = async (prompt: string): Promise<string> => {
+  if (!OPENROUTER_API_KEY) {
+    throw new Error('OpenRouter API key not configured');
+  }
+
+  const url = 'https://api.openrouter.com/v1/chat/completions';
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'openrouter-3.3-70b-versatile',
+      messages: [
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.7,
+      max_tokens: 1000,
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(`OpenRouter API Error: ${response.status} - ${JSON.stringify(errorData)}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || 'No response generated';
+};
+
 // Unified message sending function
 export const sendMessage = async (
   userMessage: string,
@@ -258,4 +327,141 @@ export const getAvailableProviders = (): AIProvider[] => {
   return providers;
 };
 
-export default { sendMessage, getQuestionHint, getAvailableProviders };
+// Generate quiz questions using AI
+export const generateQuizQuestions = async (
+  topic: string = 'Quantitative Reasoning',
+  count: number = 10,
+  provider: AIProvider = 'groq'
+): Promise<any[]> => {
+  try {
+    // Add timestamp and random seed to ensure uniqueness
+    const timestamp = Date.now();
+    const randomSeed = Math.floor(Math.random() * 1000000);
+    
+    const prompt = `[Session ID: ${timestamp}-${randomSeed}] Generate ${count} UNIQUE and DIVERSE GRE ${topic} questions. Each question MUST be completely different from any standard examples and from any previously generated sets.
+
+CRITICAL REQUIREMENTS:
+1. Return ONLY valid JSON array, no additional text or markdown
+2. Each question must be UNIQUE - avoid common textbook examples
+3. Use varied numbers, contexts, and problem structures
+4. Mix different mathematical concepts within each topic
+5. Make questions creative and realistic for GRE exam
+6. Include 2-3 GRAPH-BASED questions with visual components
+
+JSON Format (each question object must have these exact fields):
+- id: string (format: "ai_q1", "ai_q2", etc.)
+- question: string (the unique question text - make it interesting!)
+- options: array of 4 strings (answer choices with varied values)
+- correctAnswer: number (0-3, index of correct option)
+- explanation: string (detailed step-by-step explanation)
+- topic: string (choose from: "Algebra", "Geometry", "Number Theory", "Word Problems", "Data Analysis", "Coordinate Geometry")
+- difficulty: string (one of: "Easy", "Medium", "Hard")
+- hint: string (helpful hint that guides thinking without revealing answer)
+- hasGraph: boolean (optional, set to true for 2-3 questions with graphs)
+- graphData: object (REQUIRED if hasGraph is true) {
+    equation: string (e.g., "x^2 - 3*x + 2" or "2*x + 1" - use CARET notation x^2 not superscript),
+    type: string (one of: "quadratic", "linear", "exponential"),
+    highlightPoints: array of objects [{x: number, y: number, label: string}] (optional),
+    hideEquation: boolean (optional, use true if question asks to identify the equation)
+  }
+
+Topics distribution: Mix questions from Algebra, Geometry, Number Theory, Word Problems, Data Analysis, and Coordinate Geometry
+Difficulty distribution: 3 Easy, 4 Medium, 3 Hard
+Graph questions: Include 2-3 questions with hasGraph: true and proper graphData
+
+IMPORTANT FOR GRAPH QUESTIONS:
+- Use caret notation (x^2, x^3) NOT superscripts (x², x³)
+- Equations must be parseable (e.g., "x^2 - 4*x + 3", "2*x + 5", etc.)
+- Include highlight points for key features (vertices, intercepts, etc.)
+- Make graph questions about parabolas, lines, or exponential curves
+
+IMPORTANT: Randomize question order and ensure NO two questions are similar. Use creative scenarios, varied numbers, and diverse problem types.
+
+Return as JSON array of ${count} completely unique question objects.`;
+
+    console.log(`Generating ${count} questions using ${provider.toUpperCase()}...`);
+    
+    let response: string;
+    
+    if (provider === 'groq') {
+      // Use higher temperature for more creativity/randomness
+      response = await callGroqWithTemperature(prompt, 1.2);
+    } else if (provider === 'openai') {
+      response = await callOpenAI(prompt);
+    } else if (provider === 'openrouter') {
+      if (!OPENROUTER_API_KEY) {
+        throw new Error('OpenRouter API key not configured');
+      }
+      response = await callOpenRouter(prompt);
+    } else {
+      if (GEMINI_API_KEYS.length === 0) {
+        throw new Error('No AI provider configured');
+      }
+      const fullPrompt = `${SYSTEM_PROMPT}\n\n${prompt}`;
+      response = await callGeminiWithRotation(fullPrompt);
+    }
+
+    // Clean response - remove markdown code blocks if present
+    let cleanedResponse = response.trim();
+    cleanedResponse = cleanedResponse.replace(/```json\s*/g, '');
+    cleanedResponse = cleanedResponse.replace(/```\s*/g, '');
+    cleanedResponse = cleanedResponse.trim();
+    
+    // Parse JSON
+    const questions: {
+      id: string;
+      topic: string;
+      difficulty: string;
+      question: string;
+      hasGraph?: boolean;
+      graphData?: {
+        type?: string;
+        equation?: string;
+      };
+    }[] = JSON.parse(cleanedResponse);
+    
+    console.log(`Successfully generated ${questions.length} questions`);
+    console.log('=== GENERATED QUESTIONS ===');
+    questions.forEach((q, index) => {
+      console.log(`\nQuestion ${index + 1}:`);
+      console.log(`  ID: ${q.id}`);
+      console.log(`  Topic: ${q.topic}`);
+      console.log(`  Difficulty: ${q.difficulty}`);
+      console.log(`  Question: ${q.question.substring(0, 80)}...`);
+      if (q.hasGraph) {
+        console.log(`  HAS GRAPH: ${q.graphData?.type || 'unknown'}`);
+        console.log(`  Equation: ${q.graphData?.equation || 'none'}`);
+      }
+    });
+    console.log('=== END QUESTIONS ===\n');
+    questions.forEach((q: {
+      id: string;
+      topic: string;
+      difficulty: string;
+      question: string;
+      hasGraph?: boolean;
+      graphData?: {
+        type?: string;
+        equation?: string;
+      };
+    }, index: number) => {
+      console.log(`\nQuestion ${index + 1}:`);
+      console.log(`  ID: ${q.id}`);
+      console.log(`  Topic: ${q.topic}`);
+      console.log(`  Difficulty: ${q.difficulty}`);
+      console.log(`  Question: ${q.question.substring(0, 80)}...`);
+      if (q.hasGraph) {
+        console.log(`  HAS GRAPH: ${q.graphData?.type || 'unknown'}`);
+        console.log(`  Equation: ${q.graphData?.equation || 'none'}`);
+      }
+    });
+    console.log('=== END QUESTIONS ===\n');
+    
+    return questions;
+  } catch (error) {
+    console.error('Error generating quiz questions:', error);
+    throw error;
+  }
+};
+
+export default { sendMessage, getQuestionHint, getAvailableProviders, generateQuizQuestions };

@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getQuestionsForSet } from '../data/questions';
 import type { Question } from '../data/questions';
+import { generateQuizQuestions } from '../services/aiService';
 import QuizResults from '../components/QuizResults';
 import Graph from '../components/Graph';
 import ChatBot from '../components/ChatBot';
+import Calculator from '../components/Calculator';
 import './Quiz.css';
 
 interface QuestionResult {
@@ -20,6 +22,9 @@ const Quiz = () => {
   const { setId } = useParams<{ setId: string }>();
   const navigate = useNavigate();
   
+  // Quiz Mode: 'practice' shows correct/wrong immediately, 'exam' hides until end
+  const [quizMode, setQuizMode] = useState<'practice' | 'exam'>('practice');
+
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -39,14 +44,48 @@ const Quiz = () => {
   const [questionResults, setQuestionResults] = useState<QuestionResult[]>([]);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
   const [showMobileChatbot, setShowMobileChatbot] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [markedForReview, setMarkedForReview] = useState<Set<number>>(new Set());
+  const [questionNotes, setQuestionNotes] = useState<Map<number, string>>(new Map());
+  const [showNotes, setShowNotes] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
 
   useEffect(() => {
-    if (setId) {
-      const fetchedQuestions = getQuestionsForSet(setId);
-      setQuestions(fetchedQuestions);
-      setQuestionTimeStart(Date.now());
-      setQuestionTimes(new Array(fetchedQuestions.length).fill(0));
-    }
+    const loadQuestions = async () => {
+      if (!setId) return;
+
+      // For Quiz 1, generate AI questions using Groq
+      if (setId === '1') {
+        try {
+          setIsGenerating(true);
+          console.log('Generating AI questions for Quiz 1...');
+          
+          const aiQuestions = await generateQuizQuestions('Quantitative Reasoning', 10, 'groq');
+          
+          setQuestions(aiQuestions as Question[]);
+          setQuestionTimeStart(Date.now());
+          setQuestionTimes(new Array(aiQuestions.length).fill(0));
+          setIsGenerating(false);
+        } catch (error) {
+          console.error('Failed to generate questions:', error);
+          
+          // Fallback to static questions
+          const staticQuestions = getQuestionsForSet(setId);
+          setQuestions(staticQuestions);
+          setQuestionTimeStart(Date.now());
+          setQuestionTimes(new Array(staticQuestions.length).fill(0));
+          setIsGenerating(false);
+        }
+      } else {
+        // For other quizzes, use static questions
+        const fetchedQuestions = getQuestionsForSet(setId);
+        setQuestions(fetchedQuestions);
+        setQuestionTimeStart(Date.now());
+        setQuestionTimes(new Array(fetchedQuestions.length).fill(0));
+      }
+    };
+
+    loadQuestions();
   }, [setId]);
 
   // Timer for current question
@@ -117,7 +156,16 @@ const Quiz = () => {
     });
     
     setAnsweredQuestions((prev) => new Set(prev).add(currentQuestionIndex));
-    setShowExplanation(true);
+
+    // Only show explanation in practice mode, not in exam mode
+    if (quizMode === 'practice') {
+      setShowExplanation(true);
+    } else {
+      // In exam mode, move to next question automatically
+      if (!isLastQuestion) {
+        setCurrentQuestionIndex((prev) => prev + 1);
+      }
+    }
   };
 
   const saveCurrentAnswer = () => {
@@ -194,6 +242,39 @@ const Quiz = () => {
     setShowHint(!showHint);
   };
 
+  const handleSkip = () => {
+    if (isLastQuestion) {
+      handleFinishQuiz();
+      return;
+    }
+    setCurrentQuestionIndex((prev) => prev + 1);
+  };
+
+  const handleMarkForReview = () => {
+    setMarkedForReview((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(currentQuestionIndex)) {
+        newSet.delete(currentQuestionIndex);
+      } else {
+        newSet.add(currentQuestionIndex);
+      }
+      return newSet;
+    });
+  };
+
+
+  const handleNoteChange = (note: string) => {
+    setQuestionNotes((prev) => {
+      const newMap = new Map(prev);
+      if (note.trim() === '') {
+        newMap.delete(currentQuestionIndex);
+      } else {
+        newMap.set(currentQuestionIndex, note);
+      }
+      return newMap;
+    });
+  };
+
   const handleQuestionNavigation = (index: number) => {
     if (index === currentQuestionIndex) return;
     
@@ -210,15 +291,17 @@ const Quiz = () => {
     const result = questionResults.find(r => currentQuestion.id === r.questionId);
     if (result) {
       setSelectedAnswer(result.selectedAnswer);
-      setShowExplanation(true);
+      // Only show explanation in practice mode, not in exam mode
+      setShowExplanation(quizMode === 'practice');
     } else {
       setSelectedAnswer(null);
       setShowExplanation(false);
     }
     setShowHint(hintsUsed.has(currentQuestionIndex));
+    setShowNotes(false);
     setQuestionTimeStart(Date.now());
     setCurrentQuestionTime(0);
-  }, [currentQuestionIndex, currentQuestion, questionResults, hintsUsed]);
+  }, [currentQuestionIndex, currentQuestion, questionResults, hintsUsed, quizMode]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -226,13 +309,14 @@ const Quiz = () => {
     return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
   };
 
-  if (questions.length === 0) {
+  if (isGenerating || questions.length === 0) {
     return (
       <div className="quiz">
         <div className="container">
           <div className="loading">
             <div className="loading-spinner"></div>
-            <p>Loading questions...</p>
+            <p>{isGenerating ? '🤖 Generating fresh questions with AI...' : 'Loading questions...'}</p>
+            {isGenerating && <p style={{ fontSize: '0.9rem', color: '#6b7fd7', marginTop: '10px' }}>This may take a few seconds</p>}
           </div>
         </div>
       </div>
@@ -256,9 +340,39 @@ const Quiz = () => {
               <span className="progress-divider">/</span>
               <span className="progress-total">{questions.length}</span>
             </div>
+
+            {/* Quiz Mode Toggle */}
+            <div className="quiz-mode-toggle">
+              <button
+                className={`mode-btn ${quizMode === 'practice' ? 'active' : ''}`}
+                onClick={() => setQuizMode('practice')}
+                title="Practice Mode - See answers immediately"
+              >
+                📚 Practice
+              </button>
+              <button
+                className={`mode-btn ${quizMode === 'exam' ? 'active' : ''}`}
+                onClick={() => setQuizMode('exam')}
+                title="Exam Mode - No feedback until end"
+              >
+                📝 Exam
+              </button>
+            </div>
           </div>
           
           <div className="quiz-stats-compact">
+            {quizMode === 'practice' && (
+              <div className="stat-compact">
+                <span className="stat-compact-icon">✓</span>
+                <span className="stat-compact-value">{scores.correct}/{answeredQuestions.size || scores.total}</span>
+              </div>
+            )}
+            {markedForReview.size > 0 && (
+              <div className="stat-compact stat-marked">
+                <span className="stat-compact-icon">🔖</span>
+                <span className="stat-compact-value">{markedForReview.size}</span>
+              </div>
+            )}
             <div className="stat-compact">
               <span className="stat-compact-icon">✓</span>
               <span className="stat-compact-value">{scores.correct}/{answeredQuestions.size || scores.total}</span>
@@ -303,21 +417,33 @@ const Quiz = () => {
                 const isCurrent = index === currentQuestionIndex;
                 const result = questionResults.find(r => questions[index]?.id === r.questionId);
                 const usedHint = hintsUsed.has(index);
+                const isMarked = markedForReview.has(index);
 
                 let navClass = 'question-nav-item-fixed';
                 if (isCurrent) navClass += ' current';
-                if (isAnswered && result?.isCorrect) navClass += ' correct';
-                if (isAnswered && !result?.isCorrect) navClass += ' incorrect';
+
+                // Special case: if answered AND marked for review, show mixed color
+                if (isAnswered && isMarked && !isCurrent) {
+                  navClass += ' answered-marked';
+                } else {
+                  // Only show correct/incorrect in practice mode
+                  if (quizMode === 'practice' && isAnswered && result?.isCorrect) navClass += ' correct';
+                  if (quizMode === 'practice' && isAnswered && !result?.isCorrect) navClass += ' incorrect';
+                  // In exam mode, just show if answered (not current)
+                  if (quizMode === 'exam' && isAnswered && !isCurrent) navClass += ' answered';
+                  if (isMarked) navClass += ' marked';
+                }
 
                 return (
                   <button
                     key={index}
                     className={navClass}
                     onClick={() => handleQuestionNavigation(index)}
-                    title={`Question ${index + 1}`}
+                    title={`Question ${index + 1}${isMarked ? ' (Marked for Review)' : ''}`}
                   >
                     {index + 1}
                     {usedHint && <span className="hint-indicator-fixed">💡</span>}
+                    {isMarked && <span className="review-indicator-fixed">🔖</span>}
                   </button>
                 );
               })}
@@ -327,13 +453,26 @@ const Quiz = () => {
                 <span className="legend-color-fixed current"></span>
                 <span>Current</span>
               </div>
+              {quizMode === 'practice' ? (
+                <>
+                  <div className="legend-item-fixed">
+                    <span className="legend-color-fixed correct"></span>
+                    <span>Correct</span>
+                  </div>
+                  <div className="legend-item-fixed">
+                    <span className="legend-color-fixed incorrect"></span>
+                    <span>Wrong</span>
+                  </div>
+                </>
+              ) : (
+                <div className="legend-item-fixed">
+                  <span className="legend-color-fixed answered"></span>
+                  <span>Answered</span>
+                </div>
+              )}
               <div className="legend-item-fixed">
-                <span className="legend-color-fixed correct"></span>
-                <span>Correct</span>
-              </div>
-              <div className="legend-item-fixed">
-                <span className="legend-color-fixed incorrect"></span>
-                <span>Wrong</span>
+                <span className="legend-color-fixed marked"></span>
+                <span>Review</span>
               </div>
             </div>
           </div>
@@ -347,9 +486,58 @@ const Quiz = () => {
                   {currentQuestion.difficulty}
                 </span>
               </div>
+
+              <div className="question-tools-header">
+                <button
+                  className={`btn-tool-compact ${markedForReview.has(currentQuestionIndex) ? 'active' : ''}`}
+                  onClick={handleMarkForReview}
+                  title={markedForReview.has(currentQuestionIndex) ? 'Unmark for Review' : 'Mark for Review'}
+                >
+                  <span className="tool-icon">🔖</span>
+                  <span className="tool-text">
+                    {markedForReview.has(currentQuestionIndex) ? 'Marked' : 'Review'}
+                  </span>
+                </button>
+                <button
+                  className="btn-tool-compact btn-notes"
+                  onClick={() => setShowNotes(!showNotes)}
+                  title="Add Notes"
+                >
+                  <span className="tool-icon">📝</span>
+                  <span className="tool-text">Notes</span>
+                  {questionNotes.has(currentQuestionIndex) && (
+                    <span className="notes-indicator"></span>
+                  )}
+                </button>
+                <button
+                  className="btn-tool-compact btn-calculator"
+                  onClick={() => setShowCalculator(true)}
+                  title="Open Calculator"
+                >
+                  <span className="tool-icon">🔢</span>
+                  <span className="tool-text">Calculator</span>
+                </button>
+                {!showExplanation && (
+                  <button
+                    className="btn-tool-compact btn-skip"
+                    onClick={handleSkip}
+                    title="Skip this question"
+                  >
+                    <span className="tool-icon">⏭</span>
+                    <span className="tool-text">Skip</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="question-content-modern">
+              {markedForReview.has(currentQuestionIndex) && (
+                <div className="marked-for-review-banner">
+                  <span className="review-banner-icon">🔖</span>
+                  <span className="review-banner-text">Marked for Review</span>
+                </div>
+              )}
+
               {currentQuestion.hasGraph && currentQuestion.graphData && (
                 <Graph
                   equation={currentQuestion.graphData.equation}
@@ -363,7 +551,7 @@ const Quiz = () => {
                 <div className="question-text-modern">
                   {currentQuestion.question}
                 </div>
-                {!showExplanation && (
+                {!showExplanation && quizMode === 'practice' && (
                   <button
                     className="btn-hint-inline"
                     onClick={handleUseHint}
@@ -440,6 +628,26 @@ const Quiz = () => {
               )}
             </div>
 
+            {/* Notes Section */}
+            {showNotes && (
+              <div className="notes-section">
+                <div className="notes-header">
+                  <span className="notes-icon">📝</span>
+                  <h4>Your Notes</h4>
+                </div>
+                <textarea
+                  className="notes-textarea"
+                  placeholder="Add your notes for this question..."
+                  value={questionNotes.get(currentQuestionIndex) || ''}
+                  onChange={(e) => handleNoteChange(e.target.value)}
+                  rows={4}
+                />
+                <div className="notes-info">
+                  <small>Your notes are saved automatically and will be available during review.</small>
+                </div>
+              </div>
+            )}
+
             <div className="question-actions-modern">
               <div className="question-nav-buttons">
                 <button
@@ -449,13 +657,22 @@ const Quiz = () => {
                 >
                   ← Previous
                 </button>
+
+                <button
+                  className="btn-finish-quiz"
+                  onClick={handleFinishQuiz}
+                  title="Finish quiz and see results"
+                >
+                  🏁 Finish Quiz
+                </button>
+
                 {!showExplanation ? (
                   <button
                     className="btn-submit-modern"
                     onClick={handleSubmitAnswer}
                     disabled={selectedAnswer === null}
                   >
-                    Submit Answer
+                    {quizMode === 'exam' ? 'Submit & Next' : 'Submit Answer'}
                   </button>
                 ) : (
                   <button className="btn-next-modern" onClick={handleNextQuestion}>
@@ -466,10 +683,12 @@ const Quiz = () => {
             </div>
           </div>
 
-          {/* AI ChatBot - Right Side */}
-          <div className="chatbot-sidebar">
-            <ChatBot questionContext={questionContext} />
-          </div>
+          {/* AI ChatBot - Right Side - Only in Practice Mode */}
+          {quizMode === 'practice' && (
+            <div className="chatbot-sidebar">
+              <ChatBot questionContext={questionContext} />
+            </div>
+          )}
         </div>
       </div>
 
@@ -484,17 +703,19 @@ const Quiz = () => {
         />
       )}
 
-      {/* Mobile Chatbot Floating Button */}
-      <button
-        className="chatbot-floating-btn"
-        onClick={() => setShowMobileChatbot(true)}
-        aria-label="Open AI Assistant"
-      >
-        🤖
-      </button>
+      {/* Mobile Chatbot Floating Button - Only in Practice Mode */}
+      {quizMode === 'practice' && (
+        <button
+          className="chatbot-floating-btn"
+          onClick={() => setShowMobileChatbot(true)}
+          aria-label="Open AI Assistant"
+        >
+          🧑‍🏫
+        </button>
+      )}
 
-      {/* Mobile Chatbot Modal */}
-      {showMobileChatbot && (
+      {/* Mobile Chatbot Modal - Only in Practice Mode */}
+      {quizMode === 'practice' && showMobileChatbot && (
         <div className="chatbot-mobile-overlay">
           <div className="chatbot-mobile-container">
             <button
@@ -507,6 +728,11 @@ const Quiz = () => {
             <ChatBot questionContext={questionContext} />
           </div>
         </div>
+      )}
+
+      {/* Calculator Modal */}
+      {showCalculator && (
+        <Calculator onClose={() => setShowCalculator(false)} />
       )}
     </div>
   );

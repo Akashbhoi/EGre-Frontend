@@ -30,6 +30,7 @@ const ChatBot = ({ questionContext }: ChatBotProps) => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [usedHints, setUsedHints] = useState<Set<string>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -50,6 +51,7 @@ const ChatBot = ({ questionContext }: ChatBotProps) => {
         timestamp: new Date(),
       },
     ]);
+    setUsedHints(new Set()); // Reset hints when question changes
   }, [questionContext]);
 
   const handleSendMessage = async () => {
@@ -101,17 +103,35 @@ const ChatBot = ({ questionContext }: ChatBotProps) => {
   };
 
   const quickPrompts = [
-    "Explain this question",
-    "Give me a hint",
-    "What's the concept?",
-    "Study tips",
+    { id: 'explain', label: 'Explain', requiresHint: null },
+    { id: 'concept', label: 'Concept', requiresHint: null },
+    { id: 'hint1', label: 'Hint 1', requiresHint: null },
+    { id: 'hint2', label: 'Hint 2', requiresHint: 'hint1' },
+    { id: 'hint3', label: 'Hint 3', requiresHint: 'hint2' },
+    { id: 'solution', label: 'Solution', requiresHint: null },
   ];
+
+  const handleQuickPrompt = (prompt: typeof quickPrompts[0]) => {
+    setInputMessage(prompt.label);
+    // Track hint usage
+    if (prompt.id.startsWith('hint')) {
+      setUsedHints(prev => new Set(prev).add(prompt.id));
+    }
+  };
+
+  const isPromptDisabled = (prompt: typeof quickPrompts[0]) => {
+    // If it requires a previous hint, check if that hint has been used
+    if (prompt.requiresHint) {
+      return !usedHints.has(prompt.requiresHint);
+    }
+    return false;
+  };
 
   return (
     <div className="chatbot-container">
       <div className="chatbot-header">
         <div className="chatbot-header-content">
-          <div className="chatbot-icon">🤖</div>
+          <div className="chatbot-icon">🧑‍🏫</div>
           <div className="chatbot-header-text">
             <h3>AI Mentor</h3>
             <span className="chatbot-status">
@@ -149,7 +169,7 @@ const ChatBot = ({ questionContext }: ChatBotProps) => {
             className={`message ${message.sender === 'user' ? 'message-user' : 'message-bot'}`}
           >
             <div className="message-avatar">
-              {message.sender === 'user' ? '👤' : '🤖'}
+              {message.sender === 'user' ? '👤' : '🧑‍🏫'}
             </div>
             <div className="message-content">
               {message.sender === 'bot' ? (
@@ -168,7 +188,7 @@ const ChatBot = ({ questionContext }: ChatBotProps) => {
         ))}
         {isLoading && (
           <div className="message message-bot">
-            <div className="message-avatar">🤖</div>
+            <div className="message-avatar">🧑‍🏫</div>
             <div className="message-content">
               <p className="typing-indicator">
                 <span></span>
@@ -182,13 +202,18 @@ const ChatBot = ({ questionContext }: ChatBotProps) => {
       </div>
 
       <div className="chatbot-quick-prompts">
-        {quickPrompts.map((prompt, index) => (
+        {quickPrompts.map((prompt) => (
           <button
-            key={index}
+            key={prompt.id}
             className="quick-prompt-btn"
-            onClick={() => setInputMessage(prompt)}
+            onClick={() => handleQuickPrompt(prompt)}
+            disabled={isPromptDisabled(prompt)}
+            style={{
+              opacity: isPromptDisabled(prompt) ? 0.5 : 1,
+              cursor: isPromptDisabled(prompt) ? 'not-allowed' : 'pointer',
+            }}
           >
-            {prompt}
+            {prompt.label}
           </button>
         ))}
       </div>

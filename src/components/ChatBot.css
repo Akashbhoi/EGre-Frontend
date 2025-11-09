@@ -279,6 +279,21 @@
   box-shadow: 0 2px 8px rgba(107, 127, 215, 0.3);
 }
 
+.quick-prompt-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--color-gray);
+  color: var(--color-text-secondary);
+  background: var(--color-gray-light);
+}
+
+.quick-prompt-btn:disabled:hover {
+  background: var(--color-gray-light);
+  color: var(--color-text-secondary);
+  transform: none;
+  box-shadow: none;
+}
+
 .chatbot-input-area {
   display: flex;
   gap: var(--spacing-sm);

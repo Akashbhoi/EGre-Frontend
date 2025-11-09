@@ -60,6 +60,39 @@ const Graph = ({
           const b = match[2] ? parseFloat(match[2]) : 0;
           y = m * x + b;
         }
+      } else if (type === 'exponential') {
+        // Exponential parser: a*b^x or a*e^(bx) format
+        const cleanedEquation = equation.replace(/\s/g, '');
+        
+        console.log(`Parsing exponential: "${equation}" -> "${cleanedEquation}"`);
+        
+        // Try b^x format first (e.g., "2^x", "3^x")
+        let match = cleanedEquation.match(/^(\d+\.?\d*)\^x$/);
+        if (match) {
+          const b = parseFloat(match[1]);
+          console.log(`Matched b^x format: b=${b}, calculating ${b}^${x} = ${Math.pow(b, x)}`);
+          y = Math.pow(b, x);
+        } else {
+          // Try a*b^x format (e.g., "2*3^x")
+          match = cleanedEquation.match(/^(\d+\.?\d*)\*(\d+\.?\d*)\^x$/);
+          if (match) {
+            const a = parseFloat(match[1]);
+            const b = parseFloat(match[2]);
+            console.log(`Matched a*b^x format: a=${a}, b=${b}`);
+            y = a * Math.pow(b, x);
+          } else {
+            // Try e^x or e^(ax) format
+            match = cleanedEquation.match(/^(\d*\.?\d*)\*?e\^\(?(\d*\.?\d*)x?\)?$/);
+            if (match) {
+              const a = match[1] ? parseFloat(match[1]) : 1;
+              const b = match[2] ? parseFloat(match[2]) : 1;
+              console.log(`Matched e^(ax) format: a=${a}, b=${b}`);
+              y = a * Math.exp(b * x);
+            } else {
+              console.warn(`Could not parse exponential equation: ${cleanedEquation}`);
+            }
+          }
+        }
       }
       
       if (y >= yMin && y <= yMax) {
