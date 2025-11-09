@@ -608,6 +608,8 @@ const Quiz = () => {
                   type={currentQuestion.graphData.type}
                   highlightPoints={currentQuestion.graphData.highlightPoints || []}
                   hideEquation={currentQuestion.graphData.hideEquation}
+                  hideLabels={currentQuestion.graphData.hideLabels}
+                  hideAxisLabels={currentQuestion.graphData.hideAxisLabels}
                 />
               )}
               

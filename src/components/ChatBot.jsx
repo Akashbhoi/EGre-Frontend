@@ -58,8 +58,21 @@ const ChatBot = ({ questionContext }) => {
     setInputMessage('');
     setIsLoading(true);
 
+    // Add typing indicator
+    const typingIndicator = {
+      id: 'typing-indicator',
+      text: '',
+      sender: 'bot',
+      timestamp: new Date(),
+      isTyping: true,
+    };
+    setMessages((prev) => [...prev, typingIndicator]);
+
     try {
       const botResponse = await sendMessage(inputMessage, questionContext, selectedProvider);
+
+      // Remove typing indicator and add actual response
+      setMessages((prev) => prev.filter(msg => msg.id !== 'typing-indicator'));
 
       const botMessage = {
         id: (Date.now() + 1).toString(),
@@ -71,6 +84,9 @@ const ChatBot = ({ questionContext }) => {
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
+
+      // Remove typing indicator
+      setMessages((prev) => prev.filter(msg => msg.id !== 'typing-indicator'));
 
       const errorMessage = {
         id: (Date.now() + 1).toString(),
@@ -139,8 +155,21 @@ const ChatBot = ({ questionContext }) => {
     setInputMessage(''); // Clear input after sending
     setIsLoading(true);
 
+    // Add typing indicator
+    const typingIndicator = {
+      id: 'typing-indicator',
+      text: '',
+      sender: 'bot',
+      timestamp: new Date(),
+      isTyping: true,
+    };
+    setMessages((prev) => [...prev, typingIndicator]);
+
     try {
       const botResponse = await sendMessage(prompt, questionContext, selectedProvider);
+
+      // Remove typing indicator
+      setMessages((prev) => prev.filter(msg => msg.id !== 'typing-indicator'));
 
       const botMessage = {
         id: (Date.now() + 1).toString(),
@@ -152,6 +181,9 @@ const ChatBot = ({ questionContext }) => {
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
+
+      // Remove typing indicator
+      setMessages((prev) => prev.filter(msg => msg.id !== 'typing-indicator'));
 
       const errorMessage = {
         id: (Date.now() + 1).toString(),
@@ -200,11 +232,29 @@ const ChatBot = ({ questionContext }) => {
         {messages.map((msg) => (
           <div key={msg.id} className={`message ${msg.sender}`}>
             <div className="message-bubble">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+              {msg.isTyping ? (
+                <div className="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              ) : (
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    // Custom renderer for text to escape dollar signs properly
+                    text: ({node, ...props}) => <span {...props} />
+                  }}
+                >
+                  {msg.text.replace(/\$/g, '\\$')}
+                </ReactMarkdown>
+              )}
             </div>
-            <div className="message-meta">
-              {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </div>
+            {!msg.isTyping && (
+              <div className="message-meta">
+                {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </div>
+            )}
           </div>
         ))}
         <div ref={messagesEndRef} />

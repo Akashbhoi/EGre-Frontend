@@ -9,6 +9,8 @@ const Graph = ({
   highlightPoints = [],
   showGrid = true,
   hideEquation = false,
+  hideLabels = false,
+  hideAxisLabels = false,
 }) => {
   const width = 600;
   const height = 400;
@@ -163,8 +165,12 @@ const Graph = ({
         {/* Y-axis */}
         <line x1={yAxisX} y1={padding} x2={yAxisX} y2={height - padding} stroke="#999" strokeWidth="2" />
         {/* Axis labels */}
-        <text x={width - padding + 10} y={xAxisY + 5} fontSize="12" fill="#333">x</text>
-        <text x={yAxisX - 5} y={padding - 10} fontSize="12" textAnchor="end" fill="#333">y</text>
+        {!hideAxisLabels && (
+          <>
+            <text x={width - padding + 10} y={xAxisY + 5} fontSize="12" fill="#333">x</text>
+            <text x={yAxisX - 5} y={padding - 10} fontSize="12" textAnchor="end" fill="#333">y</text>
+          </>
+        )}
       </g>
     );
   };
@@ -174,7 +180,7 @@ const Graph = ({
     return highlightPoints.map((p, i) => (
       <g key={i}>
         <circle cx={xToSVG(p.x)} cy={yToSVG(p.y)} r="4" fill="#6b7fd7" />
-        {p.label && (
+        {!hideLabels && p.label && (
           <text x={xToSVG(p.x) + 8} y={yToSVG(p.y) - 8} fontSize="12" fill="#6b7fd7">{p.label}</text>
         )}
       </g>
